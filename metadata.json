@@ -1,0 +1,5 @@
+{
+  "name": "Draw to Digital Media",
+  "description": "Transform hand-drawn sketches into fancy, borderless digital media using Gemini Nano Banana models. Localized in EN, DE, and FR.",
+  "requestFramePermissions": []
+}
