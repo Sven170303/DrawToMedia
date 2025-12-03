@@ -1,0 +1,232 @@
+{
+  "common": {
+    "appName": "Draw to Media",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "credits": "Crédits",
+    "creditsSingular": "Crédit"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "generate": "Générer",
+    "history": "Historique",
+    "pricing": "Tarifs",
+    "profile": "Profil",
+    "login": "Connexion",
+    "logout": "Déconnexion"
+  },
+  "landing": {
+    "hero": {
+      "title": "Transformez vos croquis en œuvres numériques",
+      "subtitle": "Téléchargez une photo de votre croquis dessiné à la main et laissez notre IA le transformer en image numérique complète.",
+      "cta": "Commencer"
+    },
+    "features": {
+      "title": "Comment ça marche",
+      "upload": {
+        "title": "Télécharger un croquis",
+        "description": "Prenez une photo de votre dessin ou téléchargez-le directement."
+      },
+      "customize": {
+        "title": "Personnaliser",
+        "description": "Ajoutez des instructions optionnelles pour affiner le résultat."
+      },
+      "generate": {
+        "title": "Générer",
+        "description": "Notre IA transforme votre croquis en œuvre numérique."
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bon retour",
+      "subtitle": "Connectez-vous avec votre e-mail",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "votre@email.fr",
+      "submitButton": "Envoyer le code",
+      "noAccount": "Pas encore de compte ?",
+      "signUp": "S'inscrire"
+    },
+    "otp": {
+      "title": "Entrer le code",
+      "subtitle": "Nous avons envoyé un code à 6 chiffres à {email}",
+      "codeLabel": "Code de vérification",
+      "codePlaceholder": "123456",
+      "submitButton": "Vérifier",
+      "resendCode": "Renvoyer le code",
+      "resendIn": "Renvoyer dans {seconds}s"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Commencez avec votre e-mail",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "votre@email.fr",
+      "submitButton": "S'inscrire",
+      "hasAccount": "Déjà un compte ?",
+      "signIn": "Se connecter"
+    }
+  },
+  "generate": {
+    "title": "Générer une image",
+    "upload": {
+      "title": "Télécharger un croquis",
+      "dropzone": "Glissez l'image ici ou cliquez pour sélectionner",
+      "formats": "JPEG, PNG ou WEBP (max. 10 Mo)",
+      "change": "Changer l'image"
+    },
+    "options": {
+      "title": "Options",
+      "prompt": {
+        "label": "Instructions supplémentaires (optionnel)",
+        "placeholder": "ex. Ajoutez un fond rouge..."
+      },
+      "format": {
+        "label": "Format de sortie"
+      },
+      "resolution": {
+        "label": "Résolution"
+      },
+      "aspectRatio": {
+        "label": "Format d'image"
+      }
+    },
+    "submit": "Générer (1 Crédit)",
+    "generating": "Génération en cours...",
+    "generationTime": "{seconds} secondes",
+    "result": {
+      "title": "Votre résultat",
+      "download": "Télécharger",
+      "newGeneration": "Nouvelle génération"
+    },
+    "errors": {
+      "noCredits": "Pas assez de crédits. Veuillez acheter plus de crédits.",
+      "uploadFailed": "Échec du téléchargement. Veuillez réessayer.",
+      "generationFailed": "Échec de la génération. Veuillez réessayer."
+    }
+  },
+  "history": {
+    "title": "Votre historique",
+    "empty": "Vous n'avez pas encore généré d'images.",
+    "startGenerating": "Commencer",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette image ?",
+    "imageDetails": {
+      "createdAt": "Créé le",
+      "prompt": "Instructions",
+      "resolution": "Résolution",
+      "generationTime": "Temps de génération"
+    }
+  },
+  "pricing": {
+    "title": "Tarifs",
+    "subtitle": "Choisissez le forfait adapté à vos besoins",
+    "oneTime": {
+      "title": "Achat unique",
+      "subtitle": "Crédits sans date d'expiration"
+    },
+    "subscription": {
+      "title": "Abonnement",
+      "subtitle": "Crédits mensuels à prix réduit",
+      "perMonth": "/mois"
+    },
+    "packages": {
+      "starter": {
+        "name": "Starter",
+        "credits": "5 Crédits",
+        "price": "5,00 €",
+        "pricePerCredit": "1,00 € par crédit"
+      },
+      "standard": {
+        "name": "Standard",
+        "credits": "15 Crédits",
+        "price": "12,00 €",
+        "pricePerCredit": "0,80 € par crédit",
+        "badge": "Populaire"
+      },
+      "pro": {
+        "name": "Pro",
+        "credits": "50 Crédits",
+        "price": "35,00 €",
+        "pricePerCredit": "0,70 € par crédit"
+      },
+      "basicSub": {
+        "name": "Basic",
+        "credits": "12 Crédits/mois",
+        "price": "10,00 €",
+        "pricePerCredit": "0,83 € par crédit"
+      },
+      "plusSub": {
+        "name": "Plus",
+        "credits": "30 Crédits/mois",
+        "price": "20,00 €",
+        "pricePerCredit": "0,67 € par crédit",
+        "badge": "Meilleur rapport qualité-prix"
+      }
+    },
+    "buyButton": "Acheter",
+    "subscribeButton": "S'abonner",
+    "perCredit": "par crédit",
+    "features": {
+      "generations": "générations d'images",
+      "noExpiration": "Sans date d'expiration",
+      "cancelAnytime": "Annulable à tout moment",
+      "creditsAccumulate": "Les crédits s'accumulent",
+      "allResolutions": "Toutes les résolutions"
+    },
+    "error": {
+      "title": "Impossible de charger les tarifs",
+      "description": "Veuillez réessayer plus tard."
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "credits": {
+      "title": "Vos crédits",
+      "balance": "{count} crédits disponibles",
+      "buyMore": "Acheter plus"
+    },
+    "subscription": {
+      "title": "Abonnement",
+      "active": "Actif",
+      "inactive": "Pas d'abonnement actif",
+      "nextRenewal": "Prochain renouvellement : {date}",
+      "manage": "Gérer l'abonnement"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "email": "E-mail",
+      "language": "Langue",
+      "changeEmail": "Changer l'e-mail"
+    }
+  },
+  "payment": {
+    "success": {
+      "title": "Paiement réussi !",
+      "description": "Vos crédits ont été ajoutés à votre compte.",
+      "processingCredits": "Traitement des crédits...",
+      "currentBalance": "Solde actuel",
+      "startCreating": "Commencer à créer",
+      "buyMoreCredits": "Acheter plus de crédits"
+    },
+    "cancelled": {
+      "title": "Paiement annulé",
+      "description": "Le paiement a été annulé. Aucun frais n'a été facturé.",
+      "tryAgain": "Réessayer",
+      "backToHome": "Retour à l'accueil"
+    }
+  },
+  "footer": {
+    "legal": "Mentions légales",
+    "terms": "CGV",
+    "privacy": "Politique de confidentialité",
+    "imprint": "Mentions légales",
+    "contact": "Contact",
+    "copyright": "© {year} Draw to Media. Tous droits réservés."
+  }
+}

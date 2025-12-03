@@ -1,0 +1,232 @@
+{
+  "common": {
+    "appName": "Draw to Media",
+    "loading": "Laden...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Erneut versuchen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "credits": "Credits",
+    "creditsSingular": "Credit"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "generate": "Generieren",
+    "history": "Verlauf",
+    "pricing": "Preise",
+    "profile": "Profil",
+    "login": "Anmelden",
+    "logout": "Abmelden"
+  },
+  "landing": {
+    "hero": {
+      "title": "Verwandle deine Skizzen in digitale Kunstwerke",
+      "subtitle": "Lade ein Foto deiner handgezeichneten Skizze hoch und lass unsere KI sie in ein vollständiges digitales Bild verwandeln.",
+      "cta": "Jetzt starten"
+    },
+    "features": {
+      "title": "So funktioniert's",
+      "upload": {
+        "title": "Skizze hochladen",
+        "description": "Fotografiere deine Zeichnung oder lade sie direkt hoch."
+      },
+      "customize": {
+        "title": "Anpassen",
+        "description": "Füge optionale Anweisungen hinzu, um das Ergebnis zu verfeinern."
+      },
+      "generate": {
+        "title": "Generieren",
+        "description": "Unsere KI verwandelt deine Skizze in ein digitales Kunstwerk."
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Willkommen zurück",
+      "subtitle": "Melde dich mit deiner E-Mail an",
+      "emailLabel": "E-Mail-Adresse",
+      "emailPlaceholder": "deine@email.de",
+      "submitButton": "Code senden",
+      "noAccount": "Noch kein Konto?",
+      "signUp": "Registrieren"
+    },
+    "otp": {
+      "title": "Code eingeben",
+      "subtitle": "Wir haben einen 6-stelligen Code an {email} gesendet",
+      "codeLabel": "Bestätigungscode",
+      "codePlaceholder": "123456",
+      "submitButton": "Bestätigen",
+      "resendCode": "Code erneut senden",
+      "resendIn": "Erneut senden in {seconds}s"
+    },
+    "register": {
+      "title": "Konto erstellen",
+      "subtitle": "Starte mit deiner E-Mail",
+      "emailLabel": "E-Mail-Adresse",
+      "emailPlaceholder": "deine@email.de",
+      "submitButton": "Registrieren",
+      "hasAccount": "Bereits ein Konto?",
+      "signIn": "Anmelden"
+    }
+  },
+  "generate": {
+    "title": "Bild generieren",
+    "upload": {
+      "title": "Skizze hochladen",
+      "dropzone": "Bild hierher ziehen oder klicken zum Auswählen",
+      "formats": "JPEG, PNG oder WEBP (max. 10 MB)",
+      "change": "Bild ändern"
+    },
+    "options": {
+      "title": "Optionen",
+      "prompt": {
+        "label": "Zusätzliche Anweisungen (optional)",
+        "placeholder": "z.B. Füge einen roten Hintergrund hinzu..."
+      },
+      "aspectRatio": {
+        "label": "Seitenverhältnis"
+      },
+      "resolution": {
+        "label": "Auflösung"
+      },
+      "format": {
+        "label": "Ausgabeformat"
+      }
+    },
+    "submit": "Generieren (1 Credit)",
+    "generating": "Generiere...",
+    "generationTime": "{seconds} Sekunden",
+    "result": {
+      "title": "Dein Ergebnis",
+      "download": "Herunterladen",
+      "newGeneration": "Neue Generierung"
+    },
+    "errors": {
+      "noCredits": "Nicht genügend Credits. Bitte kaufe mehr Credits.",
+      "uploadFailed": "Upload fehlgeschlagen. Bitte versuche es erneut.",
+      "generationFailed": "Generierung fehlgeschlagen. Bitte versuche es erneut."
+    }
+  },
+  "history": {
+    "title": "Dein Verlauf",
+    "empty": "Du hast noch keine Bilder generiert.",
+    "startGenerating": "Jetzt starten",
+    "deleteConfirm": "Bist du sicher, dass du dieses Bild löschen möchtest?",
+    "imageDetails": {
+      "createdAt": "Erstellt am",
+      "prompt": "Anweisungen",
+      "resolution": "Auflösung",
+      "generationTime": "Generierungszeit"
+    }
+  },
+  "pricing": {
+    "title": "Preise",
+    "subtitle": "Wähle das passende Paket für deine Bedürfnisse",
+    "oneTime": {
+      "title": "Einmalkauf",
+      "subtitle": "Credits ohne Ablaufdatum"
+    },
+    "subscription": {
+      "title": "Abonnement",
+      "subtitle": "Monatliche Credits zum Vorteilspreis",
+      "perMonth": "/Monat"
+    },
+    "packages": {
+      "starter": {
+        "name": "Starter",
+        "credits": "5 Credits",
+        "price": "5,00 €",
+        "pricePerCredit": "1,00 € pro Credit"
+      },
+      "standard": {
+        "name": "Standard",
+        "credits": "15 Credits",
+        "price": "12,00 €",
+        "pricePerCredit": "0,80 € pro Credit",
+        "badge": "Beliebt"
+      },
+      "pro": {
+        "name": "Pro",
+        "credits": "50 Credits",
+        "price": "35,00 €",
+        "pricePerCredit": "0,70 € pro Credit"
+      },
+      "basicSub": {
+        "name": "Basic",
+        "credits": "12 Credits/Monat",
+        "price": "10,00 €",
+        "pricePerCredit": "0,83 € pro Credit"
+      },
+      "plusSub": {
+        "name": "Plus",
+        "credits": "30 Credits/Monat",
+        "price": "20,00 €",
+        "pricePerCredit": "0,67 € pro Credit",
+        "badge": "Bester Wert"
+      }
+    },
+    "buyButton": "Kaufen",
+    "subscribeButton": "Abonnieren",
+    "perCredit": "pro Credit",
+    "features": {
+      "generations": "Bildgenerierungen",
+      "noExpiration": "Kein Ablaufdatum",
+      "cancelAnytime": "Jederzeit kündbar",
+      "creditsAccumulate": "Credits sammeln sich an",
+      "allResolutions": "Alle Auflösungen"
+    },
+    "error": {
+      "title": "Preise konnten nicht geladen werden",
+      "description": "Bitte versuche es später erneut."
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "credits": {
+      "title": "Deine Credits",
+      "balance": "{count} Credits verfügbar",
+      "buyMore": "Mehr kaufen"
+    },
+    "subscription": {
+      "title": "Abonnement",
+      "active": "Aktiv",
+      "inactive": "Kein aktives Abo",
+      "nextRenewal": "Nächste Verlängerung: {date}",
+      "manage": "Abo verwalten"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "email": "E-Mail",
+      "language": "Sprache",
+      "changeEmail": "E-Mail ändern"
+    }
+  },
+  "payment": {
+    "success": {
+      "title": "Zahlung erfolgreich!",
+      "description": "Deine Credits wurden deinem Konto gutgeschrieben.",
+      "processingCredits": "Verarbeite Credits...",
+      "currentBalance": "Aktueller Kontostand",
+      "startCreating": "Jetzt kreativ werden",
+      "buyMoreCredits": "Mehr Credits kaufen"
+    },
+    "cancelled": {
+      "title": "Zahlung abgebrochen",
+      "description": "Die Zahlung wurde abgebrochen. Es wurden keine Kosten berechnet.",
+      "tryAgain": "Erneut versuchen",
+      "backToHome": "Zurück zur Startseite"
+    }
+  },
+  "footer": {
+    "legal": "Rechtliches",
+    "terms": "AGB",
+    "privacy": "Datenschutz",
+    "imprint": "Impressum",
+    "contact": "Kontakt",
+    "copyright": "© {year} Draw to Media. Alle Rechte vorbehalten."
+  }
+}

@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Balsamiq Sans', cursive;
+  }
+
+  body {
+    @apply bg-stone-100 text-sketch-dark;
+    background-image:
+      linear-gradient(#94a3b8 1px, transparent 1px),
+      linear-gradient(90deg, #94a3b8 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-sketch-dark text-cream-50 font-bold text-lg
+           transition-all duration-300 ease-in-out
+           hover:scale-105 active:scale-95
+           border-2 border-transparent;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    box-shadow: 2px 3px 0px 0px rgba(0,0,0,0.2);
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-white border-2 border-sketch-dark text-sketch-dark font-bold text-lg
+           transition-all duration-300 ease-in-out
+           hover:bg-sketch-dark hover:text-cream-50 hover:scale-105
+           active:scale-95;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    box-shadow: 2px 3px 0px 0px rgba(0,0,0,0.1);
+  }
+
+  .card {
+    @apply bg-white relative p-6 border-2 border-sketch-dark;
+    border-radius: 20px; /* More subtle radius for cards */
+    box-shadow: 5px 5px 0px 0px rgba(45, 45, 45, 0.1);
+  }
+  
+  /* Torn paper effect top */
+  .card::before {
+     /* This could be used for tape or paper clips later */
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border-2 border-sketch-dark
+           bg-white text-sketch-dark placeholder:text-sketch-light/70
+           focus:outline-none focus:ring-2 focus:ring-sketch-dark/20
+           transition-all duration-200 font-medium;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  }
+}
+
+@layer utilities {
+  .torn-edge-right {
+    position: relative;
+  }
+  .torn-edge-right::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -12px;
+    width: 12px;
+    background-image: radial-gradient(circle at 0% 50%, transparent 6px, #ffffff 7px);
+    background-size: 10px 20px;
+    background-repeat: repeat-y;
+    transform: rotate(180deg);
+  }
+
+  .torn-edge-bottom {
+    position: relative;
+  }
+  .torn-edge-bottom::after {
+    content: "";
+    position: absolute;
+    bottom: -12px;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background-image: radial-gradient(circle at 50% 0%, transparent 6px, #ffffff 7px);
+    background-size: 20px 10px;
+    background-repeat: repeat-x;
+    transform: rotate(180deg);
+  }
+
+  .torn-edge-top {
+    position: relative;
+  }
+  .torn-edge-top::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background-image: radial-gradient(circle at 50% 100%, transparent 6px, #ffffff 7px);
+    background-size: 20px 10px;
+    background-repeat: repeat-x;
+  }
+
+  /* Alternative jagged edge */
+  .jagged-edge-right {
+    --mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 90deg, #0000 91deg) 50% / 20px 100%;
+    -webkit-mask: var(--mask);
+    mask: var(--mask);
+  }
+
+  .rounded-sketch {
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  }
+  
+  .rounded-sketch-lg {
+    border-radius: 2% 98% 1% 99% / 99% 1% 99% 1%;
+  }
+}

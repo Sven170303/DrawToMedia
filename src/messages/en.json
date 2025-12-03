@@ -1,0 +1,232 @@
+{
+  "common": {
+    "appName": "Draw to Media",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "credits": "Credits",
+    "creditsSingular": "Credit"
+  },
+  "navigation": {
+    "home": "Home",
+    "generate": "Generate",
+    "history": "History",
+    "pricing": "Pricing",
+    "profile": "Profile",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "landing": {
+    "hero": {
+      "title": "Transform your sketches into digital artwork",
+      "subtitle": "Upload a photo of your hand-drawn sketch and let our AI transform it into a complete digital image.",
+      "cta": "Get started"
+    },
+    "features": {
+      "title": "How it works",
+      "upload": {
+        "title": "Upload sketch",
+        "description": "Take a photo of your drawing or upload it directly."
+      },
+      "customize": {
+        "title": "Customize",
+        "description": "Add optional instructions to refine the result."
+      },
+      "generate": {
+        "title": "Generate",
+        "description": "Our AI transforms your sketch into digital artwork."
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in with your email",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "your@email.com",
+      "submitButton": "Send code",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "otp": {
+      "title": "Enter code",
+      "subtitle": "We sent a 6-digit code to {email}",
+      "codeLabel": "Verification code",
+      "codePlaceholder": "123456",
+      "submitButton": "Verify",
+      "resendCode": "Resend code",
+      "resendIn": "Resend in {seconds}s"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Start with your email",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "your@email.com",
+      "submitButton": "Sign up",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  },
+  "generate": {
+    "title": "Generate image",
+    "upload": {
+      "title": "Upload sketch",
+      "dropzone": "Drag image here or click to select",
+      "formats": "JPEG, PNG or WEBP (max. 10 MB)",
+      "change": "Change image"
+    },
+    "options": {
+      "title": "Options",
+      "prompt": {
+        "label": "Additional instructions (optional)",
+        "placeholder": "e.g. Add a red background..."
+      },
+      "format": {
+        "label": "Output format"
+      },
+      "resolution": {
+        "label": "Resolution"
+      },
+      "aspectRatio": {
+        "label": "Aspect ratio"
+      }
+    },
+    "submit": "Generate (1 Credit)",
+    "generating": "Generating...",
+    "generationTime": "{seconds} seconds",
+    "result": {
+      "title": "Your result",
+      "download": "Download",
+      "newGeneration": "New generation"
+    },
+    "errors": {
+      "noCredits": "Not enough credits. Please purchase more credits.",
+      "uploadFailed": "Upload failed. Please try again.",
+      "generationFailed": "Generation failed. Please try again."
+    }
+  },
+  "history": {
+    "title": "Your history",
+    "empty": "You haven't generated any images yet.",
+    "startGenerating": "Get started",
+    "deleteConfirm": "Are you sure you want to delete this image?",
+    "imageDetails": {
+      "createdAt": "Created at",
+      "prompt": "Instructions",
+      "resolution": "Resolution",
+      "generationTime": "Generation time"
+    }
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Choose the right package for your needs",
+    "oneTime": {
+      "title": "One-time purchase",
+      "subtitle": "Credits that never expire"
+    },
+    "subscription": {
+      "title": "Subscription",
+      "subtitle": "Monthly credits at a discount",
+      "perMonth": "/month"
+    },
+    "packages": {
+      "starter": {
+        "name": "Starter",
+        "credits": "5 Credits",
+        "price": "€5.00",
+        "pricePerCredit": "€1.00 per credit"
+      },
+      "standard": {
+        "name": "Standard",
+        "credits": "15 Credits",
+        "price": "€12.00",
+        "pricePerCredit": "€0.80 per credit",
+        "badge": "Popular"
+      },
+      "pro": {
+        "name": "Pro",
+        "credits": "50 Credits",
+        "price": "€35.00",
+        "pricePerCredit": "€0.70 per credit"
+      },
+      "basicSub": {
+        "name": "Basic",
+        "credits": "12 Credits/month",
+        "price": "€10.00",
+        "pricePerCredit": "€0.83 per credit"
+      },
+      "plusSub": {
+        "name": "Plus",
+        "credits": "30 Credits/month",
+        "price": "€20.00",
+        "pricePerCredit": "€0.67 per credit",
+        "badge": "Best value"
+      }
+    },
+    "buyButton": "Buy",
+    "subscribeButton": "Subscribe",
+    "perCredit": "per credit",
+    "features": {
+      "generations": "image generations",
+      "noExpiration": "No expiration date",
+      "cancelAnytime": "Cancel anytime",
+      "creditsAccumulate": "Credits accumulate",
+      "allResolutions": "All resolutions"
+    },
+    "error": {
+      "title": "Could not load prices",
+      "description": "Please try again later."
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "credits": {
+      "title": "Your credits",
+      "balance": "{count} credits available",
+      "buyMore": "Buy more"
+    },
+    "subscription": {
+      "title": "Subscription",
+      "active": "Active",
+      "inactive": "No active subscription",
+      "nextRenewal": "Next renewal: {date}",
+      "manage": "Manage subscription"
+    },
+    "settings": {
+      "title": "Settings",
+      "email": "Email",
+      "language": "Language",
+      "changeEmail": "Change email"
+    }
+  },
+  "payment": {
+    "success": {
+      "title": "Payment successful!",
+      "description": "Your credits have been added to your account.",
+      "processingCredits": "Processing credits...",
+      "currentBalance": "Current balance",
+      "startCreating": "Start creating",
+      "buyMoreCredits": "Buy more credits"
+    },
+    "cancelled": {
+      "title": "Payment cancelled",
+      "description": "The payment was cancelled. No charges were made.",
+      "tryAgain": "Try again",
+      "backToHome": "Back to home"
+    }
+  },
+  "footer": {
+    "legal": "Legal",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "imprint": "Imprint",
+    "contact": "Contact",
+    "copyright": "© {year} Draw to Media. All rights reserved."
+  }
+}
