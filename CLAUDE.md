@@ -98,12 +98,44 @@ Nutze für Supabase den Supabase MCP um alles einzustellen.
 
 ---
 
-## Docker
+## Docker & Deployment
 
 - Multi-Stage Builds für minimale Image-Größe.
 - Non-Root User im Container.
 - Health Checks definieren.
 - Nur produktionsrelevante Files ins Image.
+- Eine `docker-compose.yml` für alle Szenarien.
+
+---
+
+## Environments & Branching
+
+| Environment | Git Branch | Supabase | ENV-Datei |
+|-------------|------------|----------|-----------|
+| Localhost | development | Development Branch | `.env.local` |
+| Coolify Dev | development | Development Branch | `.env.dev.example` |
+| Coolify Prod | main | Production (Main) | `.env.prod.example` |
+
+### Supabase Branches
+
+| Branch | Project Ref | URL |
+|--------|-------------|-----|
+| Production | `oiorfpkpqmakdakydkgl` | `https://oiorfpkpqmakdakydkgl.supabase.co` |
+| Development | `ieabmmzlobwwpxpkpkhg` | `https://ieabmmzlobwwpxpkpkhg.supabase.co` |
+
+### Workflow
+
+```
+localhost (npm run dev)     ─┐
+                             ├─→ Supabase Development Branch
+Coolify Development         ─┘
+
+Coolify Production          ───→ Supabase Production Branch
+```
+
+- Entwicklung immer auf `development` Branch (Git + Supabase Dev)
+- Nach Testing: PR von `development` → `main`
+- Production-Deployment auf `main` Branch
 
 ---
 
