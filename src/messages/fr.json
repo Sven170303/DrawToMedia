@@ -76,10 +76,17 @@
   "generate": {
     "title": "Générer une image",
     "upload": {
-      "title": "Télécharger un croquis",
+      "title": "Croquis principal",
+      "primaryDescription": "Téléchargez votre croquis principal qui servira de base pour la génération.",
       "dropzone": "Glissez l'image ici ou cliquez pour sélectionner",
       "formats": "JPEG, PNG ou WEBP (max. 10 Mo)",
-      "change": "Changer l'image"
+      "change": "Changer l'image",
+      "references": {
+        "title": "Images de référence",
+        "description": "Ajoutez des logos, textures ou autres références à incorporer dans le résultat.",
+        "add": "Ajouter",
+        "count": "références"
+      }
     },
     "options": {
       "title": "Options",
@@ -108,7 +115,8 @@
     "errors": {
       "noCredits": "Pas assez de crédits. Veuillez acheter plus de crédits.",
       "uploadFailed": "Échec du téléchargement. Veuillez réessayer.",
-      "generationFailed": "Échec de la génération. Veuillez réessayer."
+      "generationFailed": "Échec de la génération. Veuillez réessayer.",
+      "maxReferences": "Nombre maximum d'images de référence atteint (10)."
     }
   },
   "history": {
@@ -203,6 +211,13 @@
       "email": "E-mail",
       "language": "Langue",
       "changeEmail": "Changer l'e-mail"
+    }
+  },
+  "dashboard": {
+    "credits": {
+      "title": "Acheter des crédits",
+      "subtitle": "Choisissez un forfait pour obtenir plus de crédits",
+      "current": "Solde actuel"
     }
   },
   "payment": {

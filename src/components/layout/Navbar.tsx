@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Menu, X, Globe, LogOut, User } from 'lucide-react';
+import { Menu, X, Globe, LogOut, User, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link, usePathname, useRouter, routing, type Locale } from '@/i18n/routing';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,8 +20,6 @@ export function Navbar() {
   const navItems = [
     { href: '/' as const, label: t('home') },
     { href: '/pricing' as const, label: t('pricing') },
-    { href: '/generate' as const, label: t('generate') },
-    { href: '/history' as const, label: t('history') },
   ];
 
   const languageNames: Record<Locale, string> = {
@@ -112,12 +110,21 @@ export function Navbar() {
                 </button>
 
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-sketch-light/20 py-1">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-sketch-light/20 py-1 z-50">
+                    <Link
+                      href="/generate"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-cream-100 transition-colors text-sketch-dark font-semibold"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      {t('generate')}
+                    </Link>
                     <Link
                       href="/profile"
                       onClick={() => setIsUserMenuOpen(false)}
-                      className="block px-4 py-2 hover:bg-cream-100 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-cream-100 transition-colors text-sketch-dark"
                     >
+                      <User className="w-4 h-4" />
                       {t('profile')}
                     </Link>
                     <button
@@ -186,8 +193,24 @@ export function Navbar() {
                 </div>
               </div>
               {user ? (
-                <div className="pt-4 border-t border-sketch-light/20 space-y-2">
+                <div className="pt-4 border-t border-sketch-light/20 space-y-3">
                   <p className="text-sm text-sketch-light truncate">{user.email}</p>
+                  <Link
+                    href="/generate"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-2 text-sketch-dark font-semibold hover:text-sketch-dark/80 transition-colors"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    {t('generate')}
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-2 text-sketch-dark hover:text-sketch-dark/80 transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    {t('profile')}
+                  </Link>
                   <button
                     onClick={() => {
                       handleSignOut();

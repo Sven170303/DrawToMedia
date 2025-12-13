@@ -38,9 +38,8 @@ export function usePrices() {
           {
             headers: {
               'Content-Type': 'application/json',
-              ...(session?.access_token && {
-                'Authorization': `Bearer ${session.access_token}`,
-              }),
+              'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+              'Authorization': `Bearer ${session?.access_token || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
             },
           }
         );

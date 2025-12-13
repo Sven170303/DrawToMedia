@@ -42,6 +42,33 @@
         "title": "Generieren",
         "description": "Unsere KI verwandelt deine Skizze in ein digitales Kunstwerk."
       }
+    },
+    "showcase": {
+      "title": "Beeindruckende Ergebnisse",
+      "subtitle": "Sieh dir an, was aus einfachen Skizzen werden kann.",
+      "before": "Vorher (Skizze)",
+      "after": "Nachher (KI-Kunstwerk)"
+    },
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "items": {
+        "copyright": {
+          "question": "Wem gehören die generierten Bilder?",
+          "answer": "Die Bilder gehören dir! Du besitzt alle kommerziellen Rechte an den generierten Kunstwerken."
+        },
+        "format": {
+          "question": "Welche Dateiformate werden unterstützt?",
+          "answer": "Du kannst JPG, PNG und WEBP hochladen. Die generierten Bilder erhältst du als hochauflösende PNGs."
+        },
+        "privacy": {
+          "question": "Sind meine Skizzen sicher?",
+          "answer": "Ja, deine Uploads werden sicher verarbeitet und nicht öffentlich geteilt, es sei denn, du entscheidest dich dafür."
+        },
+        "credits": {
+          "question": "Was passiert, wenn meine Credits aufgebraucht sind?",
+          "answer": "Du kannst jederzeit neue Credits einzeln kaufen oder ein Abonnement abschließen, um monatlich neue Credits zu erhalten."
+        }
+      }
     }
   },
   "auth": {
@@ -76,10 +103,17 @@
   "generate": {
     "title": "Bild generieren",
     "upload": {
-      "title": "Skizze hochladen",
+      "title": "Hauptskizze",
+      "primaryDescription": "Lade deine Hauptskizze hoch, die als Grundlage für die Generierung dient.",
       "dropzone": "Bild hierher ziehen oder klicken zum Auswählen",
       "formats": "JPEG, PNG oder WEBP (max. 10 MB)",
-      "change": "Bild ändern"
+      "change": "Bild ändern",
+      "references": {
+        "title": "Referenzbilder",
+        "description": "Füge Logos, Texturen oder andere Referenzen hinzu, die im Ergebnis berücksichtigt werden sollen.",
+        "add": "Hinzufügen",
+        "count": "Referenzen"
+      }
     },
     "options": {
       "title": "Optionen",
@@ -108,7 +142,8 @@
     "errors": {
       "noCredits": "Nicht genügend Credits. Bitte kaufe mehr Credits.",
       "uploadFailed": "Upload fehlgeschlagen. Bitte versuche es erneut.",
-      "generationFailed": "Generierung fehlgeschlagen. Bitte versuche es erneut."
+      "generationFailed": "Generierung fehlgeschlagen. Bitte versuche es erneut.",
+      "maxReferences": "Maximale Anzahl an Referenzbildern erreicht (10)."
     }
   },
   "history": {
@@ -182,6 +217,13 @@
     "error": {
       "title": "Preise konnten nicht geladen werden",
       "description": "Bitte versuche es später erneut."
+    }
+  },
+  "dashboard": {
+    "credits": {
+      "title": "Credits kaufen",
+      "subtitle": "Wähle ein Paket um mehr Credits zu erhalten",
+      "current": "Aktuelles Guthaben"
     }
   },
   "profile": {

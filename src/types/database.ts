@@ -119,7 +119,7 @@ export interface Database {
           generated_image_url: string;
           user_prompt: string | null;
           system_prompt: string;
-          format: 'jpeg' | 'png';
+          format: 'jpeg' | 'png' | 'webp';
           resolution: string;
           generation_time_seconds: number;
           is_public: boolean;
@@ -132,7 +132,7 @@ export interface Database {
           generated_image_url: string;
           user_prompt?: string | null;
           system_prompt: string;
-          format: 'jpeg' | 'png';
+          format: 'jpeg' | 'png' | 'webp';
           resolution: string;
           generation_time_seconds: number;
           is_public?: boolean;
@@ -145,7 +145,7 @@ export interface Database {
           generated_image_url?: string;
           user_prompt?: string | null;
           system_prompt?: string;
-          format?: 'jpeg' | 'png';
+          format?: 'jpeg' | 'png' | 'webp';
           resolution?: string;
           generation_time_seconds?: number;
           is_public?: boolean;

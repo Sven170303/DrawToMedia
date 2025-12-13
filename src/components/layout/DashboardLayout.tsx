@@ -6,7 +6,6 @@ import {
   Sparkles,
   History,
   User,
-  CreditCard,
   LogOut,
   Menu,
   X,
@@ -18,7 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Link, usePathname, useRouter, routing, type Locale } from '@/i18n/routing';
 import { useAuth } from '@/hooks/useAuth';
-import { useUserData } from '@/hooks/useUserData';
+import { useUserDataContext } from '@/contexts/UserDataContext';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -30,7 +29,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
-  const { user: userData } = useUserData(user?.id);
+  const { user: userData } = useUserDataContext();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -42,7 +41,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { href: '/generate' as const, label: t('navigation.generate'), icon: Sparkles },
     { href: '/history' as const, label: t('navigation.history'), icon: History },
     { href: '/profile' as const, label: t('navigation.profile'), icon: User },
-    { href: '/pricing' as const, label: t('navigation.pricing'), icon: CreditCard },
   ];
 
   const languageNames: Record<Locale, string> = {
@@ -112,7 +110,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               {credits} {credits === 1 ? t('common.creditsSingular') : t('common.credits')}
             </p>
             <Link
-              href="/pricing"
+              href="/credits"
               className="btn-primary w-full block text-center text-sm py-2"
             >
               {t('profile.credits.buyMore')}
@@ -148,14 +146,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </button>
 
             {isLangOpen && (
-              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg border-2 border-sketch-dark py-2 z-50 shadow-lg">
+              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl border-2 border-sketch-dark py-2 z-50 shadow-lg overflow-hidden">
                 {routing.locales.map((loc) => (
                   <button
                     key={loc}
                     onClick={() => switchLocale(loc)}
                     className={cn(
-                      'w-full text-left px-4 py-2 text-sm font-bold hover:bg-cream-100 transition-colors',
-                      locale === loc && 'bg-yellow-50'
+                      'w-full text-left px-4 py-2.5 text-sm font-bold transition-colors bg-white',
+                      locale === loc
+                        ? 'bg-sketch-dark text-white'
+                        : 'hover:bg-cream-100 text-sketch-dark'
                     )}
                   >
                     {languageNames[loc]}
@@ -267,7 +267,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               {credits} {credits === 1 ? t('common.creditsSingular') : t('common.credits')}
             </p>
             <Link
-              href="/pricing"
+              href="/credits"
               onClick={() => setIsSidebarOpen(false)}
               className="btn-primary w-full block text-center text-sm py-2"
             >

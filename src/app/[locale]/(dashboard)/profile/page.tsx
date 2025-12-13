@@ -20,7 +20,7 @@ import {
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/useAuth';
-import { useUserData } from '@/hooks/useUserData';
+import { useUserDataContext } from '@/contexts/UserDataContext';
 import { Link } from '@/i18n/routing';
 import { createClient } from '@/lib/supabase/client';
 
@@ -37,7 +37,7 @@ export default function ProfilePage() {
   const t = useTranslations();
   const locale = useLocale();
   const { user: authUser, loading: authLoading } = useAuth();
-  const { user: userData, subscription, loading: userDataLoading, refetch } = useUserData(authUser?.id);
+  const { user: userData, subscription, loading: userDataLoading, refetch } = useUserDataContext();
   const supabase = createClient();
 
   const [purchases, setPurchases] = useState<CreditPurchase[]>([]);
@@ -183,7 +183,7 @@ export default function ProfilePage() {
               </div>
 
               <Link
-                href="/pricing"
+                href="/credits"
                 className="btn-primary w-full flex items-center justify-center gap-2"
               >
                 <CreditCard className="w-5 h-5" />
@@ -242,7 +242,7 @@ export default function ProfilePage() {
                     {t('profile.subscription.inactive')}
                   </p>
                   <Link
-                    href="/pricing"
+                    href="/credits"
                     className="btn-secondary inline-flex items-center gap-2"
                   >
                     Abonnement starten

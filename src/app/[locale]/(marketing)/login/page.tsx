@@ -28,20 +28,15 @@ export default function LoginPage() {
       return;
     }
 
-    // Redirect to verify page with email
     router.push(`/verify?email=${encodeURIComponent(email)}`);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-pattern">
+    <div className="flex-1 flex items-center justify-center px-4 py-12 bg-pattern">
       <div className="w-full max-w-md">
         <div className="card transform rotate-1 border-4 border-sketch-dark shadow-xl">
-          {/* Header */}
           <div className="text-center mb-8">
-            <Link href="/" className="font-display text-3xl text-sketch-dark transform -rotate-2 inline-block hover:scale-110 transition-transform">
-              Draw to Media
-            </Link>
-            <h1 className="font-display text-3xl text-sketch-dark mt-8 mb-2">
+            <h1 className="font-display text-3xl text-sketch-dark mb-2">
               {t('login.title')}
             </h1>
             <p className="text-sketch-medium font-medium">
@@ -49,7 +44,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
@@ -96,13 +90,12 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Footer */}
           <div className="mt-8 pt-6 border-t-2 border-dashed border-sketch-light/30 text-center">
             <p className="text-sm text-sketch-medium font-medium">
               {t('login.noAccount')}{' '}
-              <Link href="/login" className="text-sketch-dark font-bold hover:underline decoration-wavy decoration-2 underline-offset-4">
+              <span className="text-sketch-dark font-bold">
                 {t('login.signUp')}
-              </Link>
+              </span>
             </p>
           </div>
         </div>

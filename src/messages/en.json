@@ -42,6 +42,33 @@
         "title": "Generate",
         "description": "Our AI transforms your sketch into digital artwork."
       }
+    },
+    "showcase": {
+      "title": "Amazing Results",
+      "subtitle": "See what can be created from simple sketches.",
+      "before": "Before (Sketch)",
+      "after": "After (AI Artwork)"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": {
+        "copyright": {
+          "question": "Who owns the generated images?",
+          "answer": "You do! You own all commercial rights to the generated artwork."
+        },
+        "format": {
+          "question": "What file formats are supported?",
+          "answer": "You can upload JPG, PNG, and WEBP. Generated images are high-resolution PNGs."
+        },
+        "privacy": {
+          "question": "Are my sketches safe?",
+          "answer": "Yes, your uploads are processed securely and are not shared publicly unless you choose to do so."
+        },
+        "credits": {
+          "question": "What happens when I run out of credits?",
+          "answer": "You can purchase new credits at any time or subscribe to get monthly credits."
+        }
+      }
     }
   },
   "auth": {
@@ -76,10 +103,17 @@
   "generate": {
     "title": "Generate image",
     "upload": {
-      "title": "Upload sketch",
+      "title": "Main sketch",
+      "primaryDescription": "Upload your main sketch that will serve as the base for generation.",
       "dropzone": "Drag image here or click to select",
       "formats": "JPEG, PNG or WEBP (max. 10 MB)",
-      "change": "Change image"
+      "change": "Change image",
+      "references": {
+        "title": "Reference images",
+        "description": "Add logos, textures, or other references to be incorporated into the result.",
+        "add": "Add",
+        "count": "references"
+      }
     },
     "options": {
       "title": "Options",
@@ -108,7 +142,8 @@
     "errors": {
       "noCredits": "Not enough credits. Please purchase more credits.",
       "uploadFailed": "Upload failed. Please try again.",
-      "generationFailed": "Generation failed. Please try again."
+      "generationFailed": "Generation failed. Please try again.",
+      "maxReferences": "Maximum number of reference images reached (10)."
     }
   },
   "history": {
@@ -182,6 +217,13 @@
     "error": {
       "title": "Could not load prices",
       "description": "Please try again later."
+    }
+  },
+  "dashboard": {
+    "credits": {
+      "title": "Buy Credits",
+      "subtitle": "Choose a package to get more credits",
+      "current": "Current balance"
     }
   },
   "profile": {

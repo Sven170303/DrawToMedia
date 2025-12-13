@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import type { User, Subscription } from '@/types/database';
 
-interface UserData {
+interface UserDataContextType {
   user: User | null;
   subscription: Subscription | null;
   loading: boolean;
@@ -12,20 +13,24 @@ interface UserData {
   refetch: () => Promise<void>;
 }
 
-export function useUserData(userId: string | undefined): UserData {
+const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
+
+export function UserDataProvider({ children }: { children: ReactNode }) {
+  const { user: authUser, loading: authLoading } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
 
-  const fetchData = async () => {
-    if (!userId) {
+  const fetchData = useCallback(async () => {
+    if (!authUser?.id) {
+      setUser(null);
+      setSubscription(null);
       setLoading(false);
       return;
     }
 
-    setLoading(true);
     setError(null);
 
     try {
@@ -33,11 +38,10 @@ export function useUserData(userId: string | undefined): UserData {
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('*')
-        .eq('id', userId)
+        .eq('id', authUser.id)
         .single();
 
       if (userError) {
-        // User might not exist yet in public.users table
         if (userError.code === 'PGRST116') {
           setUser(null);
         } else {
@@ -47,11 +51,11 @@ export function useUserData(userId: string | undefined): UserData {
         setUser(userData);
       }
 
-      // Fetch active subscription (maybeSingle da User möglicherweise kein Abo hat)
+      // Fetch active subscription
       const { data: subData } = await supabase
         .from('subscriptions')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', authUser.id)
         .eq('status', 'active')
         .maybeSingle();
 
@@ -61,17 +65,33 @@ export function useUserData(userId: string | undefined): UserData {
     } finally {
       setLoading(false);
     }
-  };
+  }, [authUser?.id, supabase]);
 
   useEffect(() => {
-    fetchData();
-  }, [userId]);
+    if (!authLoading) {
+      fetchData();
+    }
+  }, [authUser?.id, authLoading, fetchData]);
 
-  return {
-    user,
-    subscription,
-    loading,
-    error,
-    refetch: fetchData,
-  };
+  return (
+    <UserDataContext.Provider
+      value={{
+        user,
+        subscription,
+        loading: authLoading || loading,
+        error,
+        refetch: fetchData,
+      }}
+    >
+      {children}
+    </UserDataContext.Provider>
+  );
+}
+
+export function useUserDataContext(): UserDataContextType {
+  const context = useContext(UserDataContext);
+  if (context === undefined) {
+    throw new Error('useUserDataContext must be used within a UserDataProvider');
+  }
+  return context;
 }

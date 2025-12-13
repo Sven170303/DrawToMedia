@@ -42,12 +42,10 @@ export default function VerifyPage() {
     newOtp[index] = value.slice(-1);
     setOtp(newOtp);
 
-    // Auto-focus next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Auto-submit when complete
     if (newOtp.every((digit) => digit !== '') && newOtp.join('').length === 6) {
       handleVerify(newOtp.join(''));
     }
@@ -113,7 +111,7 @@ export default function VerifyPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="card text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h1 className="font-display text-2xl text-sketch-dark mb-2">
@@ -126,10 +124,9 @@ export default function VerifyPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="flex-1 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="card">
-          {/* Back Link */}
           <Link
             href="/login"
             className="inline-flex items-center gap-2 text-sketch-medium hover:text-sketch-dark mb-6"
@@ -138,7 +135,6 @@ export default function VerifyPage() {
             {t('otp.title')}
           </Link>
 
-          {/* Header */}
           <div className="text-center mb-8">
             <h1 className="font-display text-3xl text-sketch-dark mb-2">
               {t('otp.title')}
@@ -148,7 +144,6 @@ export default function VerifyPage() {
             </p>
           </div>
 
-          {/* OTP Input */}
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-sketch-dark mb-3 text-center">
@@ -192,7 +187,6 @@ export default function VerifyPage() {
               )}
             </button>
 
-            {/* Resend */}
             <div className="text-center">
               {resendCooldown > 0 ? (
                 <p className="text-sm text-sketch-light">

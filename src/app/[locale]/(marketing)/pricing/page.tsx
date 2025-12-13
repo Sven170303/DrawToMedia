@@ -10,8 +10,6 @@ import {
   Loader2,
   AlertCircle,
 } from 'lucide-react';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/useAuth';
 import { usePrices, type Price } from '@/hooks/usePrices';
 import { useCheckout } from '@/hooks/useCheckout';
@@ -20,11 +18,11 @@ import { cn } from '@/lib/utils';
 type PricingTab = 'oneTime' | 'subscription';
 
 const PACKAGE_ICONS: Record<string, typeof Sparkles> = {
-  'prod_TX8ff9rU2hmuKA': Sparkles,  // Starter
-  'prod_TX8fxksOk2BWvV': Zap,       // Standard
-  'prod_TX8f5fPshnDHXd': Crown,     // Pro
-  'prod_TX8f4XSQ5Ut4cS': Zap,       // Basic Abo
-  'prod_TX8f6IOkSiMHzx': Crown,     // Plus Abo
+  'prod_TX8ff9rU2hmuKA': Sparkles,
+  'prod_TX8fxksOk2BWvV': Zap,
+  'prod_TX8f5fPshnDHXd': Crown,
+  'prod_TX8f4XSQ5Ut4cS': Zap,
+  'prod_TX8f6IOkSiMHzx': Crown,
 };
 
 const PACKAGE_KEYS: Record<string, string> = {
@@ -53,7 +51,7 @@ export default function PricingPage() {
 
   const handlePurchase = async (price: Price) => {
     if (!user) {
-      window.location.href = `/${locale}/login`;
+      window.location.href = `/${locale}/login?redirect=/${locale}/pricing`;
       return;
     }
 
@@ -181,10 +179,17 @@ export default function PricingPage() {
     );
   };
 
-  const content = (
-    <div className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+  if (authLoading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-sketch-dark border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-display text-3xl sm:text-4xl text-sketch-dark mb-4">
             {t('pricing.title')}
@@ -194,7 +199,6 @@ export default function PricingPage() {
           </p>
         </div>
 
-        {/* Tabs */}
         <div className="flex justify-center mb-10">
           <div className="inline-flex bg-cream-100 border-2 border-sketch-dark rounded-sketch p-1 transform -rotate-1">
             <button
@@ -222,14 +226,12 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* Loading State */}
         {pricesLoading && (
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-sketch-dark" />
           </div>
         )}
 
-        {/* Error State */}
         {pricesError && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -238,7 +240,6 @@ export default function PricingPage() {
           </div>
         )}
 
-        {/* Packages */}
         {prices && !pricesLoading && (
           <>
             {activeTab === 'oneTime' ? (
@@ -257,27 +258,6 @@ export default function PricingPage() {
           </>
         )}
       </div>
-    </div>
-  );
-
-  // Show loading state
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-sketch-dark border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (user) {
-    return <>{content}</>;
-  }
-
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-1">{content}</main>
-      <Footer />
     </div>
   );
 }

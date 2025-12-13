@@ -11,13 +11,16 @@ import {
   ImageIcon,
   Coins,
   AlertCircle,
-  Check
+  Check,
+  Plus,
+  Images,
+  Layers
 } from 'lucide-react';
 import Image from 'next/image';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/useAuth';
-import { useUserData } from '@/hooks/useUserData';
+import { useUserDataContext } from '@/contexts/UserDataContext';
 import { Link } from '@/i18n/routing';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
@@ -29,6 +32,12 @@ type AspectRatio = '21:9' | '16:9' | '3:2' | '4:3' | '5:4' | '1:1' | '4:5' | '3:
 interface GenerationResult {
   imageUrl: string;
   generationTime: number;
+}
+
+interface ReferenceImage {
+  id: string;
+  file: File;
+  preview: string;
 }
 
 // Aspect ratio configurations with visual dimensions
@@ -60,14 +69,20 @@ const OUTPUT_FORMATS: { value: OutputFormat; label: string }[] = [
 export default function GeneratePage() {
   const t = useTranslations();
   const { user: authUser, loading: authLoading } = useAuth();
-  const { user: userData, loading: userDataLoading, refetch: refetchUserData } = useUserData(authUser?.id);
+  const { user: userData, loading: userDataLoading, refetch: refetchUserData } = useUserDataContext();
   const supabase = createClient();
 
-  // Upload state
+  // Upload state - Primary sketch
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Reference images state (up to 10)
+  const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
+  const [isRefDragging, setIsRefDragging] = useState(false);
+  const refFileInputRef = useRef<HTMLInputElement>(null);
+  const MAX_REFERENCE_IMAGES = 10;
 
   // Options state
   const [userPrompt, setUserPrompt] = useState('');
@@ -80,6 +95,7 @@ export default function GeneratePage() {
   const [generationTime, setGenerationTime] = useState(0);
   const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState(false);
 
   // Timer for generation
   useEffect(() => {
@@ -159,6 +175,83 @@ export default function GeneratePage() {
     }
   };
 
+  // Reference images handlers
+  const handleRefDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsRefDragging(true);
+  }, []);
+
+  const handleRefDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsRefDragging(false);
+  }, []);
+
+  const handleRefFileDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsRefDragging(false);
+    setError(null);
+
+    const files = Array.from(e.dataTransfer.files);
+    addReferenceImages(files);
+  }, [referenceImages]);
+
+  const handleRefFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
+    const files = Array.from(e.target.files || []);
+    addReferenceImages(files);
+    if (refFileInputRef.current) {
+      refFileInputRef.current.value = '';
+    }
+  }, [referenceImages]);
+
+  const addReferenceImages = (files: File[]) => {
+    const remainingSlots = MAX_REFERENCE_IMAGES - referenceImages.length;
+    if (remainingSlots <= 0) {
+      setError(t('generate.errors.maxReferences'));
+      return;
+    }
+
+    const validFiles = files
+      .filter(file => validateFile(file))
+      .slice(0, remainingSlots);
+
+    const newImages: ReferenceImage[] = validFiles.map(file => ({
+      id: `ref-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+
+    setReferenceImages(prev => [...prev, ...newImages]);
+    setGenerationResult(null);
+  };
+
+  const removeReferenceImage = (id: string) => {
+    setReferenceImages(prev => {
+      const image = prev.find(img => img.id === id);
+      if (image) {
+        URL.revokeObjectURL(image.preview);
+      }
+      return prev.filter(img => img.id !== id);
+    });
+  };
+
+  const fileToBase64 = (file: File): Promise<{ base64: string; mimeType: string }> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Entferne das Data-URL-Prefix (data:image/png;base64,)
+        const base64 = result.split(',')[1];
+        resolve({ base64, mimeType: file.type });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleGenerate = async () => {
     if (!uploadedFile || !authUser) return;
 
@@ -174,22 +267,18 @@ export default function GeneratePage() {
     setGenerationResult(null);
 
     try {
-      // 1. Upload image to Supabase Storage
-      const fileName = `${authUser.id}/${Date.now()}_${uploadedFile.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from('uploads')
-        .upload(fileName, uploadedFile);
+      // 1. Primary sketch to Base64
+      const { base64, mimeType } = await fileToBase64(uploadedFile);
 
-      if (uploadError) {
-        throw new Error(t('generate.errors.uploadFailed'));
-      }
+      // 2. Reference images to Base64
+      const referenceImagesBase64 = await Promise.all(
+        referenceImages.map(async (ref) => {
+          const { base64: refBase64, mimeType: refMimeType } = await fileToBase64(ref.file);
+          return { base64: refBase64, mimeType: refMimeType };
+        })
+      );
 
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('uploads')
-        .getPublicUrl(fileName);
-
-      // 2. Call generate-image edge function
+      // 3. Call generate-image edge function mit Base64-Daten
       const { data: sessionData } = await supabase.auth.getSession();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/generate-image`,
@@ -200,7 +289,9 @@ export default function GeneratePage() {
             'Authorization': `Bearer ${sessionData.session?.access_token}`,
           },
           body: JSON.stringify({
-            uploadedImageUrl: publicUrlData.publicUrl,
+            imageBase64: base64,
+            imageMimeType: mimeType,
+            referenceImages: referenceImagesBase64,
             userPrompt,
             output_format: outputFormat,
             resolution,
@@ -218,6 +309,7 @@ export default function GeneratePage() {
       }
 
       const result = await response.json();
+      setIsImageLoading(true);
       setGenerationResult({
         imageUrl: result.imageUrl,
         generationTime: result.generationTime,
@@ -258,8 +350,15 @@ export default function GeneratePage() {
     setGenerationResult(null);
     setUserPrompt('');
     setError(null);
+    setIsImageLoading(false);
+    // Clear reference images and revoke URLs
+    referenceImages.forEach(img => URL.revokeObjectURL(img.preview));
+    setReferenceImages([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+    if (refFileInputRef.current) {
+      refFileInputRef.current.value = '';
     }
   };
 
@@ -328,11 +427,22 @@ export default function GeneratePage() {
                   </h2>
 
                   <div className="relative aspect-square w-full max-w-2xl mx-auto rounded-sketch-lg overflow-hidden bg-cream-100 border-2 border-sketch-dark shadow-sm p-2">
+                    {isImageLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-cream-100 z-10">
+                        <div className="text-center">
+                          <div className="w-12 h-12 border-4 border-sketch-dark border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                          <p className="text-sm text-sketch-medium font-medium">{t('common.loading')}</p>
+                        </div>
+                      </div>
+                    )}
                     <Image
                       src={generationResult.imageUrl}
                       alt="Generated image"
                       fill
                       className="object-contain rounded-sketch"
+                      unoptimized
+                      onLoad={() => setIsImageLoading(false)}
+                      onError={() => setIsImageLoading(false)}
                     />
                   </div>
 
@@ -359,69 +469,150 @@ export default function GeneratePage() {
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Upload Area */}
-              <div className="card">
-                <h2 className="font-display text-xl text-sketch-dark mb-4">
-                  {t('generate.upload.title')}
-                </h2>
+              {/* Upload Area - Two Column Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Primary Sketch Upload */}
+                <div className="lg:col-span-2 card">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Layers className="w-5 h-5 text-sketch-dark" />
+                    <h2 className="font-display text-xl text-sketch-dark">
+                      {t('generate.upload.title')}
+                    </h2>
+                  </div>
+                  <p className="text-sm text-sketch-medium mb-4">
+                    {t('generate.upload.primaryDescription')}
+                  </p>
 
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  id="file-upload"
-                />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="file-upload"
+                  />
 
-                    {uploadedPreview ? (
-                      <div className="relative">
-                        <div className="relative aspect-video w-full rounded-sketch-lg overflow-hidden bg-cream-100 border-2 border-sketch-dark p-2">
+                  {uploadedPreview ? (
+                    <div className="relative">
+                      <div className="relative aspect-video w-full rounded-sketch-lg overflow-hidden bg-cream-100 border-2 border-sketch-dark p-2">
+                        <Image
+                          src={uploadedPreview}
+                          alt="Uploaded preview"
+                          fill
+                          className="object-contain rounded-sketch"
+                        />
+                      </div>
+                      <button
+                        onClick={handleRemoveFile}
+                        className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-md border-2 border-sketch-dark hover:bg-cream-50 transition-colors"
+                        aria-label="Remove image"
+                      >
+                        <X className="w-5 h-5 text-sketch-dark" />
+                      </button>
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="mt-4 text-sm font-bold text-sketch-medium hover:text-sketch-dark underline decoration-wavy"
+                      >
+                        {t('generate.upload.change')}
+                      </button>
+                    </div>
+                  ) : (
+                    <label
+                      htmlFor="file-upload"
+                      className={`
+                        block border-2 border-dashed rounded-sketch-lg p-8 sm:p-12 text-center cursor-pointer transition-all
+                        ${isDragging
+                          ? 'border-sketch-dark bg-cream-100 transform scale-[1.02]'
+                          : 'border-sketch-light/50 hover:border-sketch-dark/50 hover:bg-cream-50 hover:rotate-1'
+                        }
+                      `}
+                      onDragEnter={handleDragEnter}
+                      onDragLeave={handleDragLeave}
+                      onDragOver={handleDragOver}
+                      onDrop={handleFileDrop}
+                    >
+                      <Upload className={`w-12 h-12 mx-auto mb-4 ${isDragging ? 'text-sketch-dark' : 'text-sketch-light'}`} />
+                      <p className="text-lg text-sketch-dark font-medium mb-2">
+                        {t('generate.upload.dropzone')}
+                      </p>
+                      <p className="text-sm text-sketch-light">
+                        {t('generate.upload.formats')}
+                      </p>
+                    </label>
+                  )}
+                </div>
+
+                {/* Reference Images */}
+                <div className="card">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Images className="w-5 h-5 text-sketch-dark" />
+                    <h2 className="font-display text-lg text-sketch-dark">
+                      {t('generate.upload.references.title')}
+                    </h2>
+                  </div>
+                  <p className="text-sm text-sketch-medium mb-4">
+                    {t('generate.upload.references.description')}
+                  </p>
+
+                  <input
+                    ref={refFileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleRefFileSelect}
+                    className="hidden"
+                    id="ref-file-upload"
+                    multiple
+                  />
+
+                  {/* Reference Images Grid */}
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    {referenceImages.map((ref) => (
+                      <div key={ref.id} className="relative group">
+                        <div className="relative aspect-square rounded-sketch overflow-hidden bg-cream-100 border-2 border-sketch-light">
                           <Image
-                            src={uploadedPreview}
-                            alt="Uploaded preview"
+                            src={ref.preview}
+                            alt="Reference"
                             fill
-                            className="object-contain rounded-sketch"
+                            className="object-cover"
                           />
                         </div>
                         <button
-                          onClick={handleRemoveFile}
-                          className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-md border-2 border-sketch-dark hover:bg-cream-50 transition-colors"
-                          aria-label="Remove image"
+                          onClick={() => removeReferenceImage(ref.id)}
+                          className="absolute -top-2 -right-2 p-1.5 bg-white rounded-full shadow-md border-2 border-sketch-dark hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                          aria-label="Remove reference"
                         >
-                          <X className="w-5 h-5 text-sketch-dark" />
-                        </button>
-                        <button
-                          onClick={() => fileInputRef.current?.click()}
-                          className="mt-4 text-sm font-bold text-sketch-medium hover:text-sketch-dark underline decoration-wavy"
-                        >
-                          {t('generate.upload.change')}
+                          <X className="w-3 h-3 text-sketch-dark" />
                         </button>
                       </div>
-                    ) : (
+                    ))}
+
+                    {/* Add More Button */}
+                    {referenceImages.length < MAX_REFERENCE_IMAGES && (
                       <label
-                        htmlFor="file-upload"
-                        className={`
-                          block border-2 border-dashed rounded-sketch-lg p-8 sm:p-12 text-center cursor-pointer transition-all
-                          ${isDragging
-                            ? 'border-sketch-dark bg-cream-100 transform scale-[1.02]'
-                            : 'border-sketch-light/50 hover:border-sketch-dark/50 hover:bg-cream-50 hover:rotate-1'
-                          }
-                        `}
-                    onDragEnter={handleDragEnter}
-                    onDragLeave={handleDragLeave}
-                    onDragOver={handleDragOver}
-                    onDrop={handleFileDrop}
-                  >
-                    <Upload className={`w-12 h-12 mx-auto mb-4 ${isDragging ? 'text-sketch-dark' : 'text-sketch-light'}`} />
-                    <p className="text-lg text-sketch-dark font-medium mb-2">
-                      {t('generate.upload.dropzone')}
-                    </p>
-                    <p className="text-sm text-sketch-light">
-                      {t('generate.upload.formats')}
-                    </p>
-                  </label>
-                )}
+                        htmlFor="ref-file-upload"
+                        className={cn(
+                          'relative aspect-square rounded-sketch border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all',
+                          isRefDragging
+                            ? 'border-sketch-dark bg-cream-100'
+                            : 'border-sketch-light/50 hover:border-sketch-dark/50 hover:bg-cream-50'
+                        )}
+                        onDragEnter={handleRefDragEnter}
+                        onDragLeave={handleRefDragLeave}
+                        onDragOver={handleDragOver}
+                        onDrop={handleRefFileDrop}
+                      >
+                        <Plus className={cn('w-6 h-6 mb-1', isRefDragging ? 'text-sketch-dark' : 'text-sketch-light')} />
+                        <span className="text-xs text-sketch-light font-medium">
+                          {t('generate.upload.references.add')}
+                        </span>
+                      </label>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-sketch-light text-center">
+                    {referenceImages.length}/{MAX_REFERENCE_IMAGES} {t('generate.upload.references.count')}
+                  </p>
+                </div>
               </div>
 
               {/* Options */}
@@ -442,13 +633,13 @@ export default function GeneratePage() {
                     <textarea
                       id="prompt"
                       value={userPrompt}
-                      onChange={(e) => setUserPrompt(e.target.value.slice(0, 500))}
+                      onChange={(e) => setUserPrompt(e.target.value.slice(0, 1500))}
                       placeholder={t('generate.options.prompt.placeholder')}
                       className="input-field min-h-[100px] resize-none"
-                      maxLength={500}
+                      maxLength={1500}
                     />
                     <p className="text-xs text-sketch-light mt-1 text-right">
-                      {userPrompt.length}/500
+                      {userPrompt.length}/1500
                     </p>
                   </div>
 
@@ -606,7 +797,7 @@ export default function GeneratePage() {
                   <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                     <p className="text-amber-800 text-sm text-center">
                       {t('generate.errors.noCredits')}{' '}
-                      <Link href="/pricing" className="font-semibold underline">
+                      <Link href="/credits" className="font-semibold underline">
                         {t('profile.credits.buyMore')}
                       </Link>
                     </p>
