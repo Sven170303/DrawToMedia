@@ -1,17 +1,26 @@
 # =============================================================================
-# Draw to Digital Media - Docker Compose for Coolify
+# Draw to Digital Media - Docker Compose for Local Development
 # =============================================================================
-# Diese Datei ist optimiert für Coolify Deployments (Development & Production)
+# Diese Datei ist für lokale Entwicklung mit Docker Desktop optimiert.
 #
-# COOLIFY SETUP:
-#   1. Build Pack: Docker Compose
-#   2. "Ports Exposes" in Coolify UI auf 3000 setzen
-#   3. KEINE "Ports Mappings" konfigurieren (Reverse Proxy handled das)
-#   4. Alle Environment Variablen in Coolify UI konfigurieren
+# VERWENDUNG:
+#   docker-compose -f docker-compose.local.yml --env-file .env.local up -d
 #
-# FÜR LOKALE ENTWICKLUNG:
-#   → Nutze docker-compose.local.yml stattdessen:
-#   → docker-compose -f docker-compose.local.yml --env-file .env.local up -d
+# STOPPEN:
+#   docker-compose -f docker-compose.local.yml down
+#
+# REBUILD (nach Code-Änderungen):
+#   docker-compose -f docker-compose.local.yml --env-file .env.local up -d --build
+#
+# LOGS:
+#   docker-compose -f docker-compose.local.yml logs -f app
+#
+# ERREICHBAR UNTER:
+#   http://localhost:3002
+#
+# PORT ÄNDERN:
+#   Falls Port 3002 belegt ist, ändere HOST_PORT in .env.local:
+#   HOST_PORT=3003
 # =============================================================================
 
 services:
@@ -23,20 +32,19 @@ services:
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:?Supabase URL is required}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:?Supabase Anon Key is required}
         NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:?Stripe Publishable Key is required}
-        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?App URL is required}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3002}
         NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV:-development}
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:?}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:?}
       - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:?}
-      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:?}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3002}
       - NEXT_PUBLIC_GA_MEASUREMENT_ID=${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
-    # WICHTIG: Kein "ports:" mapping für Coolify!
-    # Coolify's Reverse Proxy (Traefik/Caddy) routet Traffic basierend auf Domain.
-    # Der Container exposed Port 3000 intern via EXPOSE im Dockerfile.
-    expose:
-      - "3000"
+    ports:
+      # Host Port : Container Port
+      # Ändere HOST_PORT in .env.local falls 3002 belegt ist
+      - "${HOST_PORT:-3002}:3000"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
@@ -47,6 +55,6 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1G
         reservations:
-          memory: 256M
+          memory: 512M
