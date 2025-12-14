@@ -30,3 +30,12 @@ docs
 # Development files
 *.md
 *.log
+
+# Supabase Edge Functions (Deno - nicht für Next.js Build)
+supabase
+
+# Tests
+tests
+test-results
+playwright-report
+playwright.config.ts
