@@ -1,0 +1,12 @@
+# robots.txt for Draw to Media
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://draw-to-digital.com/sitemap.xml
+
+# Disallow admin/API routes
+Disallow: /api/
+Disallow: /auth/
