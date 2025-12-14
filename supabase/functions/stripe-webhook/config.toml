@@ -1,0 +1,3 @@
+# Stripe webhook does not include JWT tokens
+# Must be false to allow Stripe to call this endpoint
+verify_jwt = false

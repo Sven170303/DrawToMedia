@@ -39,13 +39,13 @@ export function useSubscription() {
         .in('status', ['active', 'trialing', 'past_due'])
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
+      if (fetchError) {
         throw fetchError;
       }
 
-      setSubscription(data || null);
+      setSubscription(data);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch subscription'));
     } finally {

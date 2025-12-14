@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,6 +9,7 @@ import { Link, useRouter } from '@/i18n/routing';
 
 function VerifyContent() {
   const t = useTranslations('auth');
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
@@ -89,7 +90,9 @@ function VerifyContent() {
 
     setSuccess(true);
     setTimeout(() => {
-      router.push('/generate');
+      // Use window.location for full page reload to ensure auth cookies are properly sent
+      // router.push can cause issues with middleware auth checks on client-side navigation
+      window.location.href = `/${locale}/generate`;
     }, 1500);
   };
 
