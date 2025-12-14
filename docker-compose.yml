@@ -3,18 +3,25 @@
 # =============================================================================
 # Eine Datei für alle Deployment-Szenarien:
 #
-# 1. LOCALHOST (npm run dev empfohlen, aber Docker möglich)
-#    → Nutzt .env.local → Supabase Development Branch
+# 1. LOCALHOST mit Docker Desktop
+#    → docker-compose --env-file .env.local up -d
+#    → Erreichbar unter http://localhost:3002
+#    → Nutzt Supabase Development Branch
 #
-# 2. COOLIFY DEVELOPMENT
-#    → ENV in Coolify UI konfigurieren → Supabase Development Branch
-#    → Git Branch: development
+# 2. COOLIFY DEVELOPMENT (Git Branch: development)
+#    → ENV in Coolify UI konfigurieren
+#    → Coolify verwaltet Ports über Reverse Proxy (Caddy/Traefik)
+#    → Nutzt Supabase Development Branch
 #
-# 3. COOLIFY PRODUCTION
-#    → ENV in Coolify UI konfigurieren → Supabase Production Branch
-#    → Git Branch: main
+# 3. COOLIFY PRODUCTION (Git Branch: main)
+#    → ENV in Coolify UI konfigurieren
+#    → Coolify verwaltet Ports über Reverse Proxy (Caddy/Traefik)
+#    → Nutzt Supabase Production Branch
 #
-# Coolify: Einfach Git-Repo verbinden, ENV-Variablen in UI setzen, deployen.
+# COOLIFY SETUP:
+#   - "Ports Exposes" in Coolify UI auf 3000 setzen
+#   - Alle NEXT_PUBLIC_* Variablen in Coolify Environment konfigurieren
+#   - Build Pack: Docker Compose
 # =============================================================================
 
 services:
@@ -36,7 +43,9 @@ services:
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:?}
       - NEXT_PUBLIC_GA_MEASUREMENT_ID=${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
     ports:
-      - "3000"
+      # Lokal: 3002:3000 (HOST_PORT nicht gesetzt → Default 3002)
+      # Coolify: Ignoriert diese Zeile und nutzt Reverse Proxy
+      - "${HOST_PORT:-3002}:3000"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]

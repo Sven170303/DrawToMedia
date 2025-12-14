@@ -77,13 +77,15 @@ export default function HistoryPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!user?.id) return;
+
     setIsDeleting(true);
     try {
       const { error } = await supabase
         .from('generations')
         .delete()
         .eq('id', id)
-        .eq('user_id', user?.id);
+        .eq('user_id', user.id);
 
       if (error) throw error;
 

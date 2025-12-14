@@ -49,12 +49,14 @@ export default function PricingSettingsPage() {
         .single();
 
       if (fetchError) throw fetchError;
+      if (!data) throw new Error('No pricing config found');
 
-      setConfig(data);
-      setTokensPerEuro(data.tokens_per_euro);
-      setTokensPerGeneration(data.tokens_per_generation);
-      setMinPurchase(parseFloat(data.min_purchase_amount));
-      setMaxPurchase(parseFloat(data.max_purchase_amount));
+      const configData = data as PricingConfig;
+      setConfig(configData);
+      setTokensPerEuro(configData.tokens_per_euro);
+      setTokensPerGeneration(configData.tokens_per_generation);
+      setMinPurchase(parseFloat(String(configData.min_purchase_amount)));
+      setMaxPurchase(parseFloat(String(configData.max_purchase_amount)));
     } catch (err) {
       setError('Failed to load pricing configuration');
       console.error(err);

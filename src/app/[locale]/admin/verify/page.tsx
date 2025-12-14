@@ -98,7 +98,8 @@ function VerifyContent() {
         .eq('id', data.user.id)
         .single();
 
-      if (userError || !userData?.is_admin) {
+      const isAdmin = userData && (userData as { is_admin: boolean }).is_admin;
+      if (userError || !isAdmin) {
         // Sign out non-admin user
         await supabase.auth.signOut();
         setError('You are not authorized to access the admin area.');

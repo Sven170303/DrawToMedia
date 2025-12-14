@@ -1,7 +1,9 @@
 import createMiddleware from 'next-intl/middleware';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { routing } from './i18n/routing';
+
+type CookieToSet = { name: string; value: string; options: CookieOptions };
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -39,7 +41,7 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: CookieToSet[]) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
@@ -73,7 +75,8 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    if (userError || !userData?.is_admin) {
+    const isAdmin = userData && (userData as { is_admin: boolean }).is_admin;
+    if (userError || !isAdmin) {
       // User is not admin, redirect to admin login with error
       const locale = pathname.split('/')[1] || routing.defaultLocale;
       const url = request.nextUrl.clone();
@@ -99,7 +102,8 @@ export async function middleware(request: NextRequest) {
         .eq('id', user.id)
         .single();
 
-      if (userData?.is_admin) {
+      const isAdminUser = userData && (userData as { is_admin: boolean }).is_admin;
+      if (isAdminUser) {
         // Already authenticated as admin, redirect to admin dashboard
         const locale = pathname.split('/')[1] || routing.defaultLocale;
         const url = request.nextUrl.clone();

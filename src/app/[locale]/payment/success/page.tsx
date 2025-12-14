@@ -37,7 +37,7 @@ function PaymentSuccessContent() {
           .single();
 
         if (userData) {
-          setCredits(userData.credits);
+          setCredits((userData as { credits: number }).credits);
         }
 
         attempts++;
