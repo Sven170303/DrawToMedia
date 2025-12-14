@@ -3,7 +3,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-const geminiApiKey = Deno.env.get("GEMINI_API_KEY")!
+const geminiApiKey = Deno.env.get("GEMINI_API_KEY")
+
+// Early validation of required environment variables
+if (!geminiApiKey) {
+  console.error("GEMINI_API_KEY is not configured")
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -80,6 +85,15 @@ serve(async (req) => {
   const startTime = Date.now()
 
   try {
+    // 0. Check for required API key
+    if (!geminiApiKey) {
+      console.error("GEMINI_API_KEY environment variable is missing")
+      return new Response(
+        JSON.stringify({ error: "Image generation service is not configured" }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+
     // 1. Authentifizierung prüfen
     const authHeader = req.headers.get("Authorization")
     if (!authHeader) {
@@ -158,6 +172,7 @@ serve(async (req) => {
     const geminiRequestBody = {
       contents: [
         {
+          role: "user",
           parts: [
             {
               text: fullPrompt
@@ -172,6 +187,7 @@ serve(async (req) => {
         }
       ],
       generationConfig: {
+        responseModalities: ["TEXT", "IMAGE"],
         imageConfig: {
           aspectRatio: geminiAspectRatio,
           imageSize: resolution

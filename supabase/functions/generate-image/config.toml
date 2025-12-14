@@ -1,0 +1,4 @@
+# Generate image handles CORS preflight requests (OPTIONS)
+# OPTIONS requests don't include JWT tokens, so verification must be disabled
+# The function itself validates the JWT token manually
+verify_jwt = false
