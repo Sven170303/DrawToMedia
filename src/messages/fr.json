@@ -228,10 +228,12 @@
     },
     "subscription": {
       "title": "Abonnement",
-      "active": "Actif",
+      "active": "Abonnement actif",
       "inactive": "Pas d'abonnement actif",
       "nextRenewal": "Prochain renouvellement : {date}",
-      "manage": "Gérer l'abonnement"
+      "manage": "Gérer l'abonnement",
+      "cancel": "Annuler l'abonnement",
+      "cancelConfirm": "Êtes-vous sûr de vouloir annuler votre abonnement ? Vous conserverez l'accès jusqu'à la fin de votre période de facturation actuelle."
     },
     "settings": {
       "title": "Paramètres",
@@ -248,13 +250,18 @@
     }
   },
   "payment": {
+    "checkout": "Paiement",
+    "preparing": "Préparation du formulaire de paiement...",
+    "securePayment": "Paiement sécurisé via Stripe",
+    "payNow": "Payer maintenant",
     "success": {
       "title": "Paiement réussi !",
-      "description": "Vos crédits ont été ajoutés à votre compte.",
+      "description": "{credits} crédits ont été ajoutés à votre compte.",
       "processingCredits": "Traitement des crédits...",
       "currentBalance": "Solde actuel",
       "startCreating": "Commencer à créer",
-      "buyMoreCredits": "Acheter plus de crédits"
+      "buyMoreCredits": "Acheter plus de crédits",
+      "continue": "Continuer"
     },
     "cancelled": {
       "title": "Paiement annulé",

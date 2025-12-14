@@ -17,13 +17,12 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // User aus JWT Token extrahieren
+    // Authenticate user
     const authHeader = req.headers.get("Authorization")
     if (!authHeader) {
       return new Response(
@@ -45,23 +44,47 @@ serve(async (req) => {
       )
     }
 
-    const { priceId, mode, locale = "de" } = await req.json()
+    const { package_id } = await req.json()
 
-    if (!priceId || !mode) {
+    if (!package_id) {
       return new Response(
-        JSON.stringify({ error: "Missing priceId or mode" }),
+        JSON.stringify({ error: "package_id is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
 
-    // Stripe Customer erstellen oder abrufen
-    let stripeCustomerId: string
+    // Get package from database (SERVER-SIDE PRICE - NOT FROM FRONTEND!)
+    const { data: pkg, error: pkgError } = await supabase
+      .from("credit_packages")
+      .select("*")
+      .eq("id", package_id)
+      .eq("is_active", true)
+      .single()
 
+    if (pkgError || !pkg) {
+      console.error("Package error:", pkgError)
+      return new Response(
+        JSON.stringify({ error: "Package not found or inactive" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+
+    // Get pricing config for currency
+    const { data: pricingConfig } = await supabase
+      .from("pricing_config")
+      .select("currency")
+      .single()
+
+    const currency = pricingConfig?.currency || "eur"
+
+    // Get or create Stripe customer
     const { data: userData } = await supabase
       .from("users")
       .select("stripe_customer_id, email")
       .eq("id", user.id)
       .single()
+
+    let stripeCustomerId: string
 
     if (userData?.stripe_customer_id) {
       stripeCustomerId = userData.stripe_customer_id
@@ -78,60 +101,40 @@ serve(async (req) => {
         .eq("id", user.id)
     }
 
-    // Frontend URL mit Fallback
-    const frontendUrl = Deno.env.get("FRONTEND_URL")?.trim() || "http://localhost:3002"
-    console.log("Using frontend URL:", frontendUrl)
-    console.log("Creating checkout for user:", user.id, "mode:", mode)
-
-    // Checkout Session erstellen
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
+    // Create PaymentIntent with SERVER-SIDE price (SECURE!)
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: pkg.price_cents, // Price from database, not from frontend!
+      currency: currency,
       customer: stripeCustomerId,
-      mode: mode as "payment" | "subscription",
-      payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${frontendUrl}/${locale}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${frontendUrl}/${locale}/payment/cancelled`,
-      locale: locale as Stripe.Checkout.SessionCreateParams.Locale,
       metadata: {
         supabase_user_id: user.id,
+        package_id: pkg.id,
+        package_name: pkg.name,
+        credits: pkg.credits.toString(),
       },
-    }
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    })
 
-    // Für Einmalzahlungen: Metadata auch auf dem PaymentIntent setzen
-    if (mode === "payment") {
-      sessionParams.payment_intent_data = {
-        metadata: {
-          supabase_user_id: user.id,
-        },
-      }
-    }
-
-    // Für Subscriptions: Metadata auf subscription_data setzen
-    if (mode === "subscription") {
-      sessionParams.subscription_data = {
-        metadata: {
-          supabase_user_id: user.id,
-        },
-      }
-    }
-
-    const session = await stripe.checkout.sessions.create(sessionParams)
-
-    console.log("Checkout session created:", session.id, "URL:", session.url)
+    console.log("PaymentIntent created:", paymentIntent.id, "for package:", pkg.name, "amount:", pkg.price_cents)
 
     return new Response(
-      JSON.stringify({ checkoutUrl: session.url }),
-      {
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-        }
-      }
+      JSON.stringify({
+        client_secret: paymentIntent.client_secret,
+        payment_intent_id: paymentIntent.id,
+        amount: pkg.price_cents,
+        currency: currency,
+        credits: pkg.credits,
+        package_name: pkg.name,
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
+
   } catch (error) {
-    console.error("Checkout error:", error)
+    console.error("Create payment intent error:", error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
   }

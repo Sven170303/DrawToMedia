@@ -235,10 +235,12 @@
     },
     "subscription": {
       "title": "Abonnement",
-      "active": "Aktiv",
+      "active": "Aktives Abonnement",
       "inactive": "Kein aktives Abo",
       "nextRenewal": "Nächste Verlängerung: {date}",
-      "manage": "Abo verwalten"
+      "manage": "Abo verwalten",
+      "cancel": "Abo kündigen",
+      "cancelConfirm": "Bist du sicher, dass du dein Abo kündigen möchtest? Du behältst den Zugang bis zum Ende des aktuellen Abrechnungszeitraums."
     },
     "settings": {
       "title": "Einstellungen",
@@ -248,13 +250,18 @@
     }
   },
   "payment": {
+    "checkout": "Bezahlung",
+    "preparing": "Zahlungsformular wird vorbereitet...",
+    "securePayment": "Sichere Zahlung über Stripe",
+    "payNow": "Jetzt bezahlen",
     "success": {
       "title": "Zahlung erfolgreich!",
-      "description": "Deine Credits wurden deinem Konto gutgeschrieben.",
+      "description": "{credits} Credits wurden deinem Konto gutgeschrieben.",
       "processingCredits": "Verarbeite Credits...",
       "currentBalance": "Aktueller Kontostand",
       "startCreating": "Jetzt kreativ werden",
-      "buyMoreCredits": "Mehr Credits kaufen"
+      "buyMoreCredits": "Mehr Credits kaufen",
+      "continue": "Weiter"
     },
     "cancelled": {
       "title": "Zahlung abgebrochen",

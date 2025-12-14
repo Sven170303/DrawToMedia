@@ -235,10 +235,12 @@
     },
     "subscription": {
       "title": "Subscription",
-      "active": "Active",
+      "active": "Active subscription",
       "inactive": "No active subscription",
       "nextRenewal": "Next renewal: {date}",
-      "manage": "Manage subscription"
+      "manage": "Manage subscription",
+      "cancel": "Cancel subscription",
+      "cancelConfirm": "Are you sure you want to cancel your subscription? You will keep access until the end of your current billing period."
     },
     "settings": {
       "title": "Settings",
@@ -248,13 +250,18 @@
     }
   },
   "payment": {
+    "checkout": "Checkout",
+    "preparing": "Preparing payment form...",
+    "securePayment": "Secure payment via Stripe",
+    "payNow": "Pay now",
     "success": {
       "title": "Payment successful!",
-      "description": "Your credits have been added to your account.",
+      "description": "{credits} credits have been added to your account.",
       "processingCredits": "Processing credits...",
       "currentBalance": "Current balance",
       "startCreating": "Start creating",
-      "buyMoreCredits": "Buy more credits"
+      "buyMoreCredits": "Buy more credits",
+      "continue": "Continue"
     },
     "cancelled": {
       "title": "Payment cancelled",
