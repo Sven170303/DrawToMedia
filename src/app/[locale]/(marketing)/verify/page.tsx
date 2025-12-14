@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, useRouter } from '@/i18n/routing';
 
-export default function VerifyPage() {
+function VerifyContent() {
   const t = useTranslations('auth');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -206,5 +206,24 @@ export default function VerifyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function VerifyLoading() {
+  return (
+    <div className="flex-1 flex items-center justify-center px-4 py-12">
+      <div className="card text-center">
+        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-sketch-medium" />
+        <p className="text-sketch-medium">Laden...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={<VerifyLoading />}>
+      <VerifyContent />
+    </Suspense>
   );
 }

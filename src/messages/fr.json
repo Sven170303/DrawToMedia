@@ -42,6 +42,33 @@
         "title": "Générer",
         "description": "Notre IA transforme votre croquis en œuvre numérique."
       }
+    },
+    "showcase": {
+      "title": "Résultats impressionnants",
+      "subtitle": "Découvrez ce que de simples croquis peuvent devenir.",
+      "before": "Avant (Croquis)",
+      "after": "Après (Œuvre IA)"
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "items": {
+        "copyright": {
+          "question": "À qui appartiennent les images générées ?",
+          "answer": "Les images vous appartiennent ! Vous détenez tous les droits commerciaux sur les œuvres générées."
+        },
+        "format": {
+          "question": "Quels formats de fichiers sont pris en charge ?",
+          "answer": "Vous pouvez télécharger des fichiers JPG, PNG et WEBP. Les images générées sont fournies en PNG haute résolution."
+        },
+        "privacy": {
+          "question": "Mes croquis sont-ils en sécurité ?",
+          "answer": "Oui, vos téléchargements sont traités en toute sécurité et ne sont pas partagés publiquement, sauf si vous le décidez."
+        },
+        "credits": {
+          "question": "Que se passe-t-il quand mes crédits sont épuisés ?",
+          "answer": "Vous pouvez acheter de nouveaux crédits à tout moment ou souscrire un abonnement pour recevoir des crédits mensuels."
+        }
+      }
     }
   },
   "auth": {
