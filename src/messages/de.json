@@ -277,5 +277,71 @@
     "imprint": "Impressum",
     "contact": "Kontakt",
     "copyright": "© {year} Draw to Media. Alle Rechte vorbehalten."
+  },
+  "legal": {
+    "imprint": {
+      "title": "Impressum",
+      "company": {
+        "title": "Angaben gemäß § 5 TMG",
+        "address": "Musterstraße 1, 12345 Musterstadt"
+      },
+      "contact": {
+        "title": "Kontakt",
+        "email": "E-Mail"
+      },
+      "responsibility": {
+        "title": "Verantwortlich für den Inhalt",
+        "text": "Die Inhalte dieser Website wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen."
+      }
+    },
+    "contact": {
+      "title": "Kontakt",
+      "email": {
+        "title": "E-Mail",
+        "description": "Für Fragen, Feedback oder Support erreichst du uns unter:"
+      }
+    },
+    "terms": {
+      "title": "Allgemeine Geschäftsbedingungen",
+      "general": {
+        "title": "1. Geltungsbereich",
+        "text": "Diese Allgemeinen Geschäftsbedingungen gelten für alle Leistungen von Draw to Media. Mit der Nutzung unserer Dienste akzeptierst du diese Bedingungen."
+      },
+      "usage": {
+        "title": "2. Nutzungsbedingungen",
+        "text": "Die generierten Bilder dürfen für private und kommerzielle Zwecke verwendet werden. Die Nutzung für illegale oder ethisch bedenkliche Zwecke ist untersagt."
+      },
+      "credits": {
+        "title": "3. Credits und Zahlung",
+        "text": "Credits werden sofort nach erfolgreicher Zahlung gutgeschrieben. Einmal gekaufte Credits sind nicht erstattungsfähig. Credits haben kein Ablaufdatum."
+      },
+      "liability": {
+        "title": "4. Haftung",
+        "text": "Wir haften nicht für Schäden, die durch die Nutzung der generierten Bilder entstehen. Die KI-Generierung kann unvorhersehbare Ergebnisse liefern."
+      }
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "collection": {
+        "title": "1. Erhebung von Daten",
+        "text": "Wir erheben nur die für die Nutzung unseres Dienstes notwendigen Daten: E-Mail-Adresse zur Authentifizierung und hochgeladene Bilder zur Verarbeitung."
+      },
+      "usage": {
+        "title": "2. Verwendung der Daten",
+        "text": "Deine Daten werden ausschließlich zur Bereitstellung unserer Dienste verwendet. Wir verkaufen oder teilen deine Daten nicht mit Dritten."
+      },
+      "storage": {
+        "title": "3. Datenspeicherung",
+        "text": "Hochgeladene Bilder werden sicher in der EU gespeichert. Generierte Bilder bleiben in deinem Account verfügbar, bis du sie löschst."
+      },
+      "rights": {
+        "title": "4. Deine Rechte",
+        "text": "Du hast das Recht auf Auskunft, Berichtigung und Löschung deiner Daten. Kontaktiere uns für entsprechende Anfragen."
+      },
+      "cookies": {
+        "title": "5. Cookies",
+        "text": "Wir verwenden nur technisch notwendige Cookies für die Authentifizierung. Es werden keine Tracking-Cookies verwendet."
+      }
+    }
   }
 }

@@ -277,5 +277,71 @@
     "imprint": "Imprint",
     "contact": "Contact",
     "copyright": "© {year} Draw to Media. All rights reserved."
+  },
+  "legal": {
+    "imprint": {
+      "title": "Imprint",
+      "company": {
+        "title": "Company Information",
+        "address": "Sample Street 1, 12345 Sample City"
+      },
+      "contact": {
+        "title": "Contact",
+        "email": "Email"
+      },
+      "responsibility": {
+        "title": "Responsible for Content",
+        "text": "The contents of this website have been created with the greatest care. However, we cannot guarantee the accuracy, completeness, or timeliness of the content."
+      }
+    },
+    "contact": {
+      "title": "Contact",
+      "email": {
+        "title": "Email",
+        "description": "For questions, feedback, or support, you can reach us at:"
+      }
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "general": {
+        "title": "1. Scope",
+        "text": "These Terms of Service apply to all services provided by Draw to Media. By using our services, you accept these terms."
+      },
+      "usage": {
+        "title": "2. Usage Terms",
+        "text": "Generated images may be used for private and commercial purposes. Use for illegal or ethically questionable purposes is prohibited."
+      },
+      "credits": {
+        "title": "3. Credits and Payment",
+        "text": "Credits are credited immediately after successful payment. Once purchased, credits are non-refundable. Credits do not expire."
+      },
+      "liability": {
+        "title": "4. Liability",
+        "text": "We are not liable for damages arising from the use of generated images. AI generation may produce unpredictable results."
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "collection": {
+        "title": "1. Data Collection",
+        "text": "We only collect data necessary for providing our service: email address for authentication and uploaded images for processing."
+      },
+      "usage": {
+        "title": "2. Data Usage",
+        "text": "Your data is used exclusively to provide our services. We do not sell or share your data with third parties."
+      },
+      "storage": {
+        "title": "3. Data Storage",
+        "text": "Uploaded images are securely stored in the EU. Generated images remain available in your account until you delete them."
+      },
+      "rights": {
+        "title": "4. Your Rights",
+        "text": "You have the right to access, correct, and delete your data. Contact us for such requests."
+      },
+      "cookies": {
+        "title": "5. Cookies",
+        "text": "We only use technically necessary cookies for authentication. No tracking cookies are used."
+      }
+    }
   }
 }
