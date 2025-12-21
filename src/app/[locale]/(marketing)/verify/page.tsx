@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, useRouter } from '@/i18n/routing';
@@ -10,10 +9,9 @@ import { Link, useRouter } from '@/i18n/routing';
 function VerifyContent() {
   const t = useTranslations('auth');
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const email = searchParams.get('email') || '';
   const { verifyOtp, signInWithOtp } = useAuth();
 
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,11 +20,15 @@ function VerifyContent() {
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  // Get email from sessionStorage instead of URL params
   useEffect(() => {
-    if (!email) {
+    const storedEmail = sessionStorage.getItem('verifyEmail');
+    if (storedEmail) {
+      setEmail(storedEmail);
+    } else {
       router.push('/login');
     }
-  }, [email, router]);
+  }, [router]);
 
   useEffect(() => {
     if (resendCooldown > 0) {

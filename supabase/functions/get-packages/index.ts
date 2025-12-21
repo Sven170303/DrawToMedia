@@ -4,13 +4,27 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!
 const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
+// Allowed origins for CORS (public endpoint - wider access allowed)
+const ALLOWED_ORIGINS = [
+  "https://draw-to-digital.com",
+  "https://www.draw-to-digital.com",
+  "https://dev.draw-to-digital.com",
+  "http://localhost:3000",
+]
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+  }
 }
 
 serve(async (req) => {
+  const origin = req.headers.get("Origin")
+  const corsHeaders = getCorsHeaders(origin)
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders })
   }
@@ -103,10 +117,9 @@ serve(async (req) => {
       }
     )
 
-  } catch (error) {
-    console.error("Get packages error:", error)
+  } catch (_error) {
     return new Response(
-      JSON.stringify({ error: error.message || "Internal server error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
   }

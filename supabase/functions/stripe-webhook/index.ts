@@ -22,18 +22,28 @@ const LEGACY_PRICE_TO_CREDITS: Record<string, number> = {
   "price_1Sa4OIB6KiFq7suQEVEkd6oe": 30,
 }
 
-// Idempotenz-Check
+// Idempotenz-Check (fixed SQL injection by using parameterized query)
 async function isEventProcessed(
   supabase: ReturnType<typeof createClient>,
   identifier: string
 ): Promise<boolean> {
-  const { data } = await supabase
+  // Check for payment intent ID
+  const { data: intentData } = await supabase
     .from("credit_purchases")
     .select("id")
-    .or(`stripe_session_id.eq.${identifier},stripe_payment_intent_id.eq.${identifier}`)
+    .eq("stripe_payment_intent_id", identifier)
     .limit(1)
 
-  return data && data.length > 0
+  if (intentData && intentData.length > 0) return true
+
+  // Check for session ID
+  const { data: sessionData } = await supabase
+    .from("credit_purchases")
+    .select("id")
+    .eq("stripe_session_id", identifier)
+    .limit(1)
+
+  return sessionData && sessionData.length > 0
 }
 
 // Manuelle Signatur-Verifizierung
@@ -103,7 +113,6 @@ serve(async (req) => {
   const verification = await verifyStripeSignature(body, signature, webhookSecret)
 
   if (!verification.valid) {
-    console.error("Signature verification failed:", verification.error)
     return new Response(
       JSON.stringify({ error: "Invalid signature" }),
       { status: 400, headers: { "Content-Type": "application/json" } }
@@ -132,15 +141,18 @@ serve(async (req) => {
         const creditsStr = paymentIntent.metadata?.credits
 
         if (!userId) {
-          console.log("No user ID in payment intent metadata, might be from another source")
+          // No user ID in payment intent metadata, might be from another source
           break
         }
 
         // Idempotenz-Check
         const alreadyProcessed = await isEventProcessed(supabase, paymentIntent.id)
         if (alreadyProcessed) {
-          console.log("Payment intent already processed:", paymentIntent.id)
-          break
+          // Already processed - return success to prevent retries
+          return new Response(
+            JSON.stringify({ received: true, message: "Already processed" }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+          )
         }
 
         let credits = 0
@@ -174,8 +186,11 @@ serve(async (req) => {
 
           if (insertError) {
             if (insertError.code === "23505") {
-              console.log("Duplicate payment intent:", paymentIntent.id)
-              break
+              // Duplicate - already processed, return success
+              return new Response(
+                JSON.stringify({ received: true, message: "Already processed" }),
+                { status: 200, headers: { "Content-Type": "application/json" } }
+              )
             }
             throw insertError
           }
@@ -189,8 +204,6 @@ serve(async (req) => {
           if (rpcError) {
             throw rpcError
           }
-
-          console.log("Credits added:", credits, "for user:", userId)
         }
         break
       }
@@ -201,7 +214,7 @@ serve(async (req) => {
         const userId = session.metadata?.supabase_user_id
 
         if (!userId) {
-          console.log("No user ID in session metadata")
+          // No user ID in session metadata
           break
         }
 
@@ -209,7 +222,10 @@ serve(async (req) => {
           // Legacy one-time payment via Checkout
           const alreadyProcessed = await isEventProcessed(supabase, session.id)
           if (alreadyProcessed) {
-            break
+            return new Response(
+              JSON.stringify({ received: true, message: "Already processed" }),
+              { status: 200, headers: { "Content-Type": "application/json" } }
+            )
           }
 
           const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
@@ -293,7 +309,6 @@ serve(async (req) => {
               p_user_id: userId,
               p_amount: credits
             })
-            console.log("Subscription credits added:", credits, "for user:", userId)
           }
         }
         break
@@ -314,7 +329,7 @@ serve(async (req) => {
             .single()
 
           if (!subData) {
-            console.log("No subscription found for:", subscription.id)
+            // No subscription found
             break
           }
 
@@ -346,7 +361,6 @@ serve(async (req) => {
               p_user_id: subData.user_id,
               p_amount: credits
             })
-            console.log("Subscription renewal credits added:", credits, "for user:", subData.user_id)
           }
 
           await supabase
@@ -394,8 +408,7 @@ serve(async (req) => {
       { status: 200, headers: { "Content-Type": "application/json" } }
     )
 
-  } catch (error) {
-    console.error("Webhook processing error:", error)
+  } catch (_error) {
     return new Response(
       JSON.stringify({ error: "Webhook processing failed" }),
       { status: 500, headers: { "Content-Type": "application/json" } }

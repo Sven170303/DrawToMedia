@@ -10,13 +10,27 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  "https://draw-to-digital.com",
+  "https://www.draw-to-digital.com",
+  "https://dev.draw-to-digital.com",
+  "http://localhost:3000",
+]
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  }
 }
 
 serve(async (req) => {
+  const origin = req.headers.get("Origin")
+  const corsHeaders = getCorsHeaders(origin)
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders })
   }
@@ -37,7 +51,6 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
     if (authError || !user) {
-      console.error("Auth error:", authError)
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -62,7 +75,6 @@ serve(async (req) => {
       .single()
 
     if (planError || !plan) {
-      console.error("Plan error:", planError)
       return new Response(
         JSON.stringify({ error: "Subscription plan not found or inactive" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -189,8 +201,6 @@ serve(async (req) => {
       },
     })
 
-    console.log("Checkout session created:", session.id, "for plan:", plan.name)
-
     return new Response(
       JSON.stringify({
         checkout_url: session.url,
@@ -199,10 +209,9 @@ serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
 
-  } catch (error) {
-    console.error("Create subscription error:", error)
+  } catch (_error) {
     return new Response(
-      JSON.stringify({ error: error.message || "Internal server error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
   }
