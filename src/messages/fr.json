@@ -277,5 +277,71 @@
     "imprint": "Mentions légales",
     "contact": "Contact",
     "copyright": "© {year} Draw to Media. Tous droits réservés."
+  },
+  "legal": {
+    "imprint": {
+      "title": "Mentions légales",
+      "company": {
+        "title": "Informations sur l'entreprise",
+        "address": "Rue Exemple 1, 12345 Ville Exemple"
+      },
+      "contact": {
+        "title": "Contact",
+        "email": "E-mail"
+      },
+      "responsibility": {
+        "title": "Responsable du contenu",
+        "text": "Le contenu de ce site a été créé avec le plus grand soin. Cependant, nous ne pouvons garantir l'exactitude, l'exhaustivité ou l'actualité du contenu."
+      }
+    },
+    "contact": {
+      "title": "Contact",
+      "email": {
+        "title": "E-mail",
+        "description": "Pour toute question, commentaire ou assistance, vous pouvez nous contacter à :"
+      }
+    },
+    "terms": {
+      "title": "Conditions Générales de Vente",
+      "general": {
+        "title": "1. Champ d'application",
+        "text": "Ces Conditions Générales s'appliquent à tous les services fournis par Draw to Media. En utilisant nos services, vous acceptez ces conditions."
+      },
+      "usage": {
+        "title": "2. Conditions d'utilisation",
+        "text": "Les images générées peuvent être utilisées à des fins privées et commerciales. L'utilisation à des fins illégales ou éthiquement douteuses est interdite."
+      },
+      "credits": {
+        "title": "3. Crédits et paiement",
+        "text": "Les crédits sont crédités immédiatement après le paiement réussi. Les crédits achetés ne sont pas remboursables. Les crédits n'expirent pas."
+      },
+      "liability": {
+        "title": "4. Responsabilité",
+        "text": "Nous ne sommes pas responsables des dommages résultant de l'utilisation des images générées. La génération par IA peut produire des résultats imprévisibles."
+      }
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "collection": {
+        "title": "1. Collecte de données",
+        "text": "Nous ne collectons que les données nécessaires à la fourniture de notre service : adresse e-mail pour l'authentification et images téléchargées pour le traitement."
+      },
+      "usage": {
+        "title": "2. Utilisation des données",
+        "text": "Vos données sont utilisées exclusivement pour fournir nos services. Nous ne vendons ni ne partageons vos données avec des tiers."
+      },
+      "storage": {
+        "title": "3. Stockage des données",
+        "text": "Les images téléchargées sont stockées de manière sécurisée dans l'UE. Les images générées restent disponibles dans votre compte jusqu'à ce que vous les supprimiez."
+      },
+      "rights": {
+        "title": "4. Vos droits",
+        "text": "Vous avez le droit d'accéder, de corriger et de supprimer vos données. Contactez-nous pour de telles demandes."
+      },
+      "cookies": {
+        "title": "5. Cookies",
+        "text": "Nous n'utilisons que des cookies techniquement nécessaires pour l'authentification. Aucun cookie de suivi n'est utilisé."
+      }
+    }
   }
 }
