@@ -12,6 +12,7 @@ const ALLOWED_ORIGINS = [
   "https://draw-to-digital.com",
   "https://www.draw-to-digital.com",
   "https://dev.draw-to-digital.com",
+  "https://dev-drawtomedia.coolify.itt.lu",
   "http://localhost:3000",
 ]
 
