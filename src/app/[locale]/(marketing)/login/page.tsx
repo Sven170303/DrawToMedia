@@ -23,7 +23,16 @@ export default function LoginPage() {
     const { error } = await signInWithOtp(email);
 
     if (error) {
-      setError(error.message);
+      // Map Supabase errors to user-friendly messages
+      let errorKey = 'errors.generic';
+      if (error.message.includes('rate limit') || error.message.includes('429')) {
+        errorKey = 'errors.rateLimited';
+      } else if (error.message.includes('invalid') || error.message.includes('Invalid')) {
+        errorKey = 'errors.invalidEmail';
+      } else if (error.message.includes('Database') || error.message.includes('database')) {
+        errorKey = 'errors.databaseError';
+      }
+      setError(t(errorKey, { seconds: '60' }));
       setLoading(false);
       return;
     }
@@ -90,6 +99,10 @@ export default function LoginPage() {
                 </>
               )}
             </button>
+
+            <p className="text-xs text-sketch-light text-center mt-3">
+              {t('login.hint')}
+            </p>
           </form>
 
           <div className="mt-8 pt-6 border-t-2 border-dashed border-sketch-light/30 text-center">

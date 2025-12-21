@@ -73,13 +73,14 @@
   },
   "auth": {
     "login": {
-      "title": "Willkommen zurück",
-      "subtitle": "Melde dich mit deiner E-Mail an",
+      "title": "Willkommen",
+      "subtitle": "Melde dich an oder erstelle ein neues Konto",
       "emailLabel": "E-Mail-Adresse",
       "emailPlaceholder": "deine@email.de",
       "submitButton": "Code senden",
-      "noAccount": "Noch kein Konto?",
-      "signUp": "Registrieren"
+      "noAccount": "Neu hier?",
+      "signUp": "Kein Problem, wir erstellen dir automatisch ein Konto!",
+      "hint": "Wir senden dir einen 6-stelligen Code per E-Mail"
     },
     "otp": {
       "title": "Code eingeben",
@@ -88,7 +89,16 @@
       "codePlaceholder": "123456",
       "submitButton": "Bestätigen",
       "resendCode": "Code erneut senden",
-      "resendIn": "Erneut senden in {seconds}s"
+      "resendIn": "Erneut senden in {seconds}s",
+      "checkSpam": "Nicht erhalten? Schau auch im Spam-Ordner nach.",
+      "newUser": {
+        "title": "Willkommen bei Draw to Media!",
+        "subtitle": "Wir haben dir einen Bestätigungscode gesendet. Nach der Verifizierung ist dein Konto aktiv."
+      },
+      "existingUser": {
+        "title": "Willkommen zurück!",
+        "subtitle": "Gib den Code ein, den wir an {email} gesendet haben."
+      }
     },
     "register": {
       "title": "Konto erstellen",
@@ -98,6 +108,12 @@
       "submitButton": "Registrieren",
       "hasAccount": "Bereits ein Konto?",
       "signIn": "Anmelden"
+    },
+    "errors": {
+      "databaseError": "Es gab ein Problem mit dem Server. Bitte versuche es später erneut.",
+      "rateLimited": "Zu viele Versuche. Bitte warte {seconds} Sekunden.",
+      "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+      "generic": "Ein Fehler ist aufgetreten. Bitte versuche es erneut."
     }
   },
   "generate": {
