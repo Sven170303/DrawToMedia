@@ -28,7 +28,9 @@ export default function LoginPage() {
       return;
     }
 
-    router.push(`/verify?email=${encodeURIComponent(email)}`);
+    // Store email in sessionStorage instead of URL to prevent exposure in browser history
+    sessionStorage.setItem('verifyEmail', email);
+    router.push('/verify');
   };
 
   return (

@@ -14,10 +14,21 @@ const stripe = stripeSecretKey
     })
   : null
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+// Allowed origins for CORS (admin endpoint - restricted access)
+const ALLOWED_ORIGINS = [
+  "https://draw-to-digital.com",
+  "https://www.draw-to-digital.com",
+  "https://dev.draw-to-digital.com",
+  "http://localhost:3000",
+]
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  }
 }
 
 // ============================================================================
@@ -88,8 +99,7 @@ async function syncCreditPackageToStripe(
     if (currentPackage.stripe_price_id) {
       try {
         await stripe.prices.update(currentPackage.stripe_price_id, { active: false })
-      } catch (archiveError) {
-        console.warn("Could not archive old price:", archiveError)
+      } catch (_archiveError) {
         // Continue anyway - old price might already be archived
       }
     }
@@ -112,8 +122,7 @@ async function syncCreditPackageToStripe(
       newProductId: stripeProductId,
     }
   } catch (error) {
-    console.error("Stripe sync error for package:", error)
-    return { success: false, error: error.message }
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
   }
 }
 
@@ -171,8 +180,8 @@ async function syncSubscriptionPlanToStripe(
     if (currentPlan.stripe_price_id) {
       try {
         await stripe.prices.update(currentPlan.stripe_price_id, { active: false })
-      } catch (archiveError) {
-        console.warn("Could not archive old price:", archiveError)
+      } catch (_archiveError) {
+        // Continue anyway - old price might already be archived
       }
     }
 
@@ -197,12 +206,14 @@ async function syncSubscriptionPlanToStripe(
       newProductId: stripeProductId,
     }
   } catch (error) {
-    console.error("Stripe sync error for plan:", error)
-    return { success: false, error: error.message }
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
   }
 }
 
 serve(async (req) => {
+  const origin = req.headers.get("Origin")
+  const corsHeaders = getCorsHeaders(origin)
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders })
   }
@@ -385,9 +396,6 @@ serve(async (req) => {
             if (stripeSyncResult.newPriceId) {
               updateData.stripe_price_id = stripeSyncResult.newPriceId
             }
-          } else {
-            console.error("Stripe sync failed:", stripeSyncResult.error)
-            // Don't fail the whole operation, but log the warning
           }
         }
 
@@ -675,8 +683,6 @@ serve(async (req) => {
             if (stripeSyncResult.newPriceId) {
               updateData.stripe_price_id = stripeSyncResult.newPriceId
             }
-          } else {
-            console.error("Stripe sync failed for subscription plan:", stripeSyncResult.error)
           }
         }
 
@@ -886,10 +892,9 @@ serve(async (req) => {
         )
     }
 
-  } catch (error) {
-    console.error("Admin update pricing error:", error)
+  } catch (_error) {
     return new Response(
-      JSON.stringify({ error: error.message || "Internal server error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
   }

@@ -26,11 +26,25 @@ export function usePaymentIntent() {
 
     try {
       const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
 
-      if (!session) {
+      // Get session and refresh token if needed
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
         router.push(`/${locale}/login`);
         return null;
+      }
+
+      // Check if token needs refresh (expires within 60 seconds)
+      let accessToken = session.access_token;
+      const expiresAt = session.expires_at;
+      if (expiresAt && expiresAt * 1000 - Date.now() < 60000) {
+        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError || !refreshData.session) {
+          router.push(`/${locale}/login`);
+          return null;
+        }
+        accessToken = refreshData.session.access_token;
       }
 
       const response = await fetch(
@@ -39,7 +53,7 @@ export function usePaymentIntent() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
+            'Authorization': `Bearer ${accessToken}`,
             'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
           },
           body: JSON.stringify({ package_id: packageId }),

@@ -5,16 +5,28 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL")!
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 const geminiApiKey = Deno.env.get("GEMINI_API_KEY")
 
-// Early validation of required environment variables
-if (!geminiApiKey) {
-  console.error("GEMINI_API_KEY is not configured")
+// Early validation of required environment variables - checked at runtime
+
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  "https://draw-to-digital.com",
+  "https://www.draw-to-digital.com",
+  "https://dev.draw-to-digital.com",
+  "http://localhost:3000",
+]
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  }
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-}
+// Simple in-memory rate limiting (per-user, 5 second cooldown)
+const rateLimitMap = new Map<string, number>()
+const RATE_LIMIT_MS = 5000
 
 // Aspect Ratio zu Gemini-Format Mapping
 const ASPECT_RATIO_MAP: Record<string, string> = {
@@ -83,6 +95,9 @@ interface GeminiResponse {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get("Origin")
+  const corsHeaders = getCorsHeaders(origin)
+
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders })
@@ -93,7 +108,6 @@ serve(async (req) => {
   try {
     // 0. Check for required API key
     if (!geminiApiKey) {
-      console.error("GEMINI_API_KEY environment variable is missing")
       return new Response(
         JSON.stringify({ error: "Image generation service is not configured" }),
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -115,12 +129,22 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
     if (authError || !user) {
-      console.error("Auth error:", authError)
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
+
+    // 1.5 Rate Limiting - prevent spam requests
+    const lastRequest = rateLimitMap.get(user.id)
+    if (lastRequest && Date.now() - lastRequest < RATE_LIMIT_MS) {
+      const waitTime = Math.ceil((RATE_LIMIT_MS - (Date.now() - lastRequest)) / 1000)
+      return new Response(
+        JSON.stringify({ error: `Rate limited. Please wait ${waitTime} seconds.` }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+    rateLimitMap.set(user.id, Date.now())
 
     // 2. Request-Body parsen und validieren
     const body: GenerateRequest = await req.json()
@@ -145,27 +169,20 @@ serve(async (req) => {
       )
     }
 
-    // 3. Credits prüfen
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("credits")
-      .eq("id", user.id)
-      .single()
+    // 3. Credits ZUERST abziehen (atomare Operation - verhindert Race Conditions)
+    const { data: creditDeducted, error: creditError } = await supabase.rpc("deduct_credit", {
+      p_user_id: user.id
+    })
 
-    if (userError || !userData) {
-      console.error("User data error:", userError)
-      return new Response(
-        JSON.stringify({ error: "Could not retrieve user data" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
-    }
-
-    if (userData.credits < 1) {
+    if (creditError || !creditDeducted) {
       return new Response(
         JSON.stringify({ error: "Insufficient credits" }),
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
+
+    // Flag to track if we need to refund the credit on error
+    let shouldRefundCredit = true
 
     // 4. Gemini API aufrufen
     const geminiAspectRatio = ASPECT_RATIO_MAP[aspect_ratio] || "1:1"
@@ -199,7 +216,6 @@ serve(async (req) => {
           }
         })
       }
-      console.log(`Including ${referenceImages.length} reference image(s) in request`)
     }
 
     const geminiRequestBody = {
@@ -216,31 +232,53 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Calling Gemini API for user ${user.id} with aspect ratio ${geminiAspectRatio} and resolution ${resolution}`)
-    console.log(`Request body structure: contents with ${parts.length} parts, imageConfig: ${JSON.stringify(geminiRequestBody.generationConfig)}`)
+    // Gemini API call with timeout (30 seconds)
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 30000)
 
-    const geminiResponse = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": geminiApiKey
-        },
-        body: JSON.stringify(geminiRequestBody)
+    let geminiResponse: Response
+    try {
+      geminiResponse = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": geminiApiKey
+          },
+          body: JSON.stringify(geminiRequestBody),
+          signal: controller.signal
+        }
+      )
+    } catch (fetchError) {
+      clearTimeout(timeout)
+      // Refund credit on timeout/network error
+      if (shouldRefundCredit) {
+        await supabase.rpc("add_credits", { p_user_id: user.id, p_amount: 1 })
       }
-    )
+      const errorMessage = fetchError instanceof Error && fetchError.name === "AbortError"
+        ? "Generation timed out. Please try again."
+        : "Network error. Please try again."
+      return new Response(
+        JSON.stringify({ error: errorMessage }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+    clearTimeout(timeout)
 
     if (!geminiResponse.ok) {
       const errorText = await geminiResponse.text()
-      console.error("Gemini API error:", geminiResponse.status, errorText)
+
+      // Refund credit on API error
+      if (shouldRefundCredit) {
+        await supabase.rpc("add_credits", { p_user_id: user.id, p_amount: 1 })
+      }
 
       // Parse error for more specific feedback
       let userMessage = "Image generation failed. Please try again."
       try {
         const errorJson = JSON.parse(errorText)
         if (errorJson.error?.message) {
-          console.error("Gemini error message:", errorJson.error.message)
           // Check for common error types
           if (errorJson.error.message.includes("API key")) {
             userMessage = "Image generation service configuration error."
@@ -263,9 +301,12 @@ serve(async (req) => {
     const geminiResult: GeminiResponse = await geminiResponse.json()
 
     if (geminiResult.error) {
-      console.error("Gemini API returned error:", geminiResult.error)
+      // Refund credit on Gemini error
+      if (shouldRefundCredit) {
+        await supabase.rpc("add_credits", { p_user_id: user.id, p_amount: 1 })
+      }
       return new Response(
-        JSON.stringify({ error: "Image generation failed: " + geminiResult.error.message }),
+        JSON.stringify({ error: "Image generation failed. Please try a different prompt." }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
@@ -286,7 +327,10 @@ serve(async (req) => {
     }
 
     if (!generatedImageData) {
-      console.error("No image in Gemini response:", JSON.stringify(geminiResult).substring(0, 500))
+      // Refund credit if no image was generated
+      if (shouldRefundCredit) {
+        await supabase.rpc("add_credits", { p_user_id: user.id, p_amount: 1 })
+      }
       return new Response(
         JSON.stringify({ error: "No image was generated. Please try a different prompt." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -315,12 +359,18 @@ serve(async (req) => {
       })
 
     if (uploadError) {
-      console.error("Storage upload error:", uploadError)
+      // Refund credit on storage error
+      if (shouldRefundCredit) {
+        await supabase.rpc("add_credits", { p_user_id: user.id, p_amount: 1 })
+      }
       return new Response(
         JSON.stringify({ error: "Failed to save generated image" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
+
+    // Image successfully stored - no refund needed anymore
+    shouldRefundCredit = false
 
     // Public URL generieren
     const { data: publicUrlData } = supabase.storage
@@ -329,27 +379,12 @@ serve(async (req) => {
 
     const generatedImageUrl = publicUrlData.publicUrl
 
-    // 7. Credit abziehen (atomare Operation)
-    const { data: creditDeducted, error: creditError } = await supabase.rpc("deduct_credit", {
-      p_user_id: user.id
-    })
-
-    if (creditError || !creditDeducted) {
-      console.error("Credit deduction error:", creditError || "Insufficient credits")
-      // Bild löschen bei Fehler
-      await supabase.storage.from("generations").remove([fileName])
-      return new Response(
-        JSON.stringify({ error: "Insufficient credits" }),
-        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
-    }
-
-    // 8. Generation in Datenbank loggen
+    // 7. Generation in Datenbank loggen (Credit wurde bereits in Schritt 3 abgezogen)
     const generationTimeSeconds = Math.round((Date.now() - startTime) / 1000)
 
-    const { error: insertError } = await supabase.from("generations").insert({
+    await supabase.from("generations").insert({
       user_id: user.id,
-      original_image_url: "inline_base64", // Originalbild wurde nicht gespeichert
+      original_image_url: "inline_base64",
       generated_image_url: generatedImageUrl,
       user_prompt: userPrompt || null,
       system_prompt: SYSTEM_PROMPT,
@@ -359,14 +394,7 @@ serve(async (req) => {
       is_public: false
     })
 
-    if (insertError) {
-      console.error("Generation insert error:", insertError)
-      // Nicht kritisch - Bild wurde erfolgreich generiert
-    }
-
-    console.log(`Generation completed for user ${user.id} in ${generationTimeSeconds}s`)
-
-    // 9. Erfolgreiche Response
+    // 8. Erfolgreiche Response
     return new Response(
       JSON.stringify({
         imageUrl: generatedImageUrl,
@@ -380,8 +408,7 @@ serve(async (req) => {
       }
     )
 
-  } catch (error) {
-    console.error("Generate image error:", error)
+  } catch (_error) {
     return new Response(
       JSON.stringify({ error: "An unexpected error occurred" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
