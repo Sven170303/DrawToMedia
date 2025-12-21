@@ -8,6 +8,7 @@ import { Link, useRouter } from '@/i18n/routing';
 
 function VerifyContent() {
   const t = useTranslations('auth');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
   const { verifyOtp, signInWithOtp } = useAuth();
@@ -83,7 +84,14 @@ function VerifyContent() {
     const { error } = await verifyOtp(email, token);
 
     if (error) {
-      setError(error.message);
+      // Map Supabase errors to user-friendly messages
+      let errorMessage = t('errors.generic');
+      if (error.message.includes('expired') || error.message.includes('invalid')) {
+        errorMessage = t('errors.generic');
+      } else if (error.message.includes('rate limit') || error.message.includes('429')) {
+        errorMessage = t('errors.rateLimited', { seconds: '60' });
+      }
+      setError(errorMessage);
       setLoading(false);
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
@@ -120,9 +128,9 @@ function VerifyContent() {
         <div className="card text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h1 className="font-display text-2xl text-sketch-dark mb-2">
-            Erfolgreich angemeldet!
+            {t('otp.existingUser.title')}
           </h1>
-          <p className="text-sketch-medium">Du wirst weitergeleitet...</p>
+          <p className="text-sketch-medium">{tCommon('loading')}</p>
         </div>
       </div>
     );
@@ -192,7 +200,7 @@ function VerifyContent() {
               )}
             </button>
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
               {resendCooldown > 0 ? (
                 <p className="text-sm text-sketch-light">
                   {t('otp.resendIn', { seconds: resendCooldown })}
@@ -206,6 +214,9 @@ function VerifyContent() {
                   {t('otp.resendCode')}
                 </button>
               )}
+              <p className="text-xs text-sketch-light">
+                {t('otp.checkSpam')}
+              </p>
             </div>
           </div>
         </div>
@@ -215,11 +226,12 @@ function VerifyContent() {
 }
 
 function VerifyLoading() {
+  const tCommon = useTranslations('common');
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-12">
       <div className="card text-center">
         <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-sketch-medium" />
-        <p className="text-sketch-medium">Laden...</p>
+        <p className="text-sketch-medium">{tCommon('loading')}</p>
       </div>
     </div>
   );

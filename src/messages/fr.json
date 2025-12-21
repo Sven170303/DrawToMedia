@@ -73,13 +73,14 @@
   },
   "auth": {
     "login": {
-      "title": "Bon retour",
-      "subtitle": "Connectez-vous avec votre e-mail",
+      "title": "Bienvenue",
+      "subtitle": "Connectez-vous ou créez un nouveau compte",
       "emailLabel": "Adresse e-mail",
       "emailPlaceholder": "votre@email.fr",
       "submitButton": "Envoyer le code",
-      "noAccount": "Pas encore de compte ?",
-      "signUp": "S'inscrire"
+      "noAccount": "Nouveau ici ?",
+      "signUp": "Pas de problème, nous créerons automatiquement un compte pour vous !",
+      "hint": "Nous vous enverrons un code à 6 chiffres par e-mail"
     },
     "otp": {
       "title": "Entrer le code",
@@ -88,7 +89,16 @@
       "codePlaceholder": "123456",
       "submitButton": "Vérifier",
       "resendCode": "Renvoyer le code",
-      "resendIn": "Renvoyer dans {seconds}s"
+      "resendIn": "Renvoyer dans {seconds}s",
+      "checkSpam": "Pas reçu ? Vérifiez votre dossier spam.",
+      "newUser": {
+        "title": "Bienvenue sur Draw to Media !",
+        "subtitle": "Nous vous avons envoyé un code de vérification. Votre compte sera actif après la vérification."
+      },
+      "existingUser": {
+        "title": "Bon retour !",
+        "subtitle": "Entrez le code que nous avons envoyé à {email}."
+      }
     },
     "register": {
       "title": "Créer un compte",
@@ -98,6 +108,12 @@
       "submitButton": "S'inscrire",
       "hasAccount": "Déjà un compte ?",
       "signIn": "Se connecter"
+    },
+    "errors": {
+      "databaseError": "Un problème serveur s'est produit. Veuillez réessayer plus tard.",
+      "rateLimited": "Trop de tentatives. Veuillez patienter {seconds} secondes.",
+      "invalidEmail": "Veuillez entrer une adresse e-mail valide.",
+      "generic": "Une erreur s'est produite. Veuillez réessayer."
     }
   },
   "generate": {
