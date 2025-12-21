@@ -374,13 +374,19 @@ export default function PackagesSettingsPage() {
                   <input
                     type="number"
                     min="1"
-                    value={editingPackage.credits}
-                    onChange={(e) =>
+                    value={editingPackage.credits || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
                       setEditingPackage({
                         ...editingPackage,
-                        credits: parseInt(e.target.value) || 1,
-                      })
-                    }
+                        credits: value === '' ? 0 : parseInt(value, 10),
+                      });
+                    }}
+                    onBlur={(e) => {
+                      if (!editingPackage.credits || editingPackage.credits < 1) {
+                        setEditingPackage({ ...editingPackage, credits: 1 });
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -391,17 +397,23 @@ export default function PackagesSettingsPage() {
                   <input
                     type="number"
                     min="1"
-                    value={editingPackage.price_cents}
-                    onChange={(e) =>
+                    value={editingPackage.price_cents || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
                       setEditingPackage({
                         ...editingPackage,
-                        price_cents: parseInt(e.target.value) || 1,
-                      })
-                    }
+                        price_cents: value === '' ? 0 : parseInt(value, 10),
+                      });
+                    }}
+                    onBlur={(e) => {
+                      if (!editingPackage.price_cents || editingPackage.price_cents < 1) {
+                        setEditingPackage({ ...editingPackage, price_cents: 1 });
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    = {formatPrice(editingPackage.price_cents)}
+                    = {formatPrice(editingPackage.price_cents || 0)}
                   </p>
                 </div>
               </div>

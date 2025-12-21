@@ -482,13 +482,19 @@ export default function SubscriptionSettingsPage() {
                   <input
                     type="number"
                     min="1"
-                    value={editingPlan.credits_per_month}
-                    onChange={(e) =>
+                    value={editingPlan.credits_per_month || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
                       setEditingPlan({
                         ...editingPlan,
-                        credits_per_month: parseInt(e.target.value) || 1,
-                      })
-                    }
+                        credits_per_month: value === '' ? 0 : parseInt(value, 10),
+                      });
+                    }}
+                    onBlur={() => {
+                      if (!editingPlan.credits_per_month || editingPlan.credits_per_month < 1) {
+                        setEditingPlan({ ...editingPlan, credits_per_month: 1 });
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -499,17 +505,23 @@ export default function SubscriptionSettingsPage() {
                   <input
                     type="number"
                     min="1"
-                    value={editingPlan.price_cents}
-                    onChange={(e) =>
+                    value={editingPlan.price_cents || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
                       setEditingPlan({
                         ...editingPlan,
-                        price_cents: parseInt(e.target.value) || 1,
-                      })
-                    }
+                        price_cents: value === '' ? 0 : parseInt(value, 10),
+                      });
+                    }}
+                    onBlur={() => {
+                      if (!editingPlan.price_cents || editingPlan.price_cents < 1) {
+                        setEditingPlan({ ...editingPlan, price_cents: 1 });
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    = {formatPrice(editingPlan.price_cents)}
+                    = {formatPrice(editingPlan.price_cents || 0)}
                   </p>
                 </div>
               </div>

@@ -3,7 +3,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-const geminiApiKey = Deno.env.get("GEMINI_API_KEY")!
+const geminiApiKey = Deno.env.get("GEMINI_API_KEY")
+
+// Early validation of required environment variables - checked at runtime
 
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
@@ -59,9 +61,15 @@ Your task is to transform the provided sketch/drawing into a high-quality digita
 Follow the user's specific instructions for style, colors, and any modifications they request.
 Output only the transformed image without any text explanation.`
 
+interface ReferenceImage {
+  base64: string
+  mimeType: string
+}
+
 interface GenerateRequest {
   imageBase64: string
   imageMimeType: string
+  referenceImages?: ReferenceImage[]
   userPrompt: string
   output_format: "png" | "jpeg" | "webp"
   resolution: "1K" | "2K" | "4K"
@@ -98,6 +106,14 @@ serve(async (req) => {
   const startTime = Date.now()
 
   try {
+    // 0. Check for required API key
+    if (!geminiApiKey) {
+      return new Response(
+        JSON.stringify({ error: "Image generation service is not configured" }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+
     // 1. Authentifizierung prüfen
     const authHeader = req.headers.get("Authorization")
     if (!authHeader) {
@@ -132,7 +148,7 @@ serve(async (req) => {
 
     // 2. Request-Body parsen und validieren
     const body: GenerateRequest = await req.json()
-    const { imageBase64, imageMimeType, userPrompt, output_format, resolution, aspect_ratio } = body
+    const { imageBase64, imageMimeType, referenceImages, userPrompt, output_format, resolution, aspect_ratio } = body
 
     if (!imageBase64 || !imageMimeType) {
       return new Response(
@@ -176,20 +192,36 @@ serve(async (req) => {
       ? `${SYSTEM_PROMPT}\n\nUser's specific instructions: ${userPrompt}`
       : SYSTEM_PROMPT
 
+    // Build parts array with main image and optional reference images
+    const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [
+      {
+        text: fullPrompt
+      },
+      {
+        inlineData: {
+          mimeType: imageMimeType,
+          data: cleanBase64
+        }
+      }
+    ]
+
+    // Add reference images if provided
+    if (referenceImages && referenceImages.length > 0) {
+      for (const refImage of referenceImages) {
+        const cleanRefBase64 = refImage.base64.replace(/^data:image\/\w+;base64,/, "")
+        parts.push({
+          inlineData: {
+            mimeType: refImage.mimeType,
+            data: cleanRefBase64
+          }
+        })
+      }
+    }
+
     const geminiRequestBody = {
       contents: [
         {
-          parts: [
-            {
-              text: fullPrompt
-            },
-            {
-              inlineData: {
-                mimeType: imageMimeType,
-                data: cleanBase64
-              }
-            }
-          ]
+          parts: parts
         }
       ],
       generationConfig: {
@@ -235,12 +267,33 @@ serve(async (req) => {
     clearTimeout(timeout)
 
     if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text()
+
       // Refund credit on API error
       if (shouldRefundCredit) {
         await supabase.rpc("add_credits", { p_user_id: user.id, p_amount: 1 })
       }
+
+      // Parse error for more specific feedback
+      let userMessage = "Image generation failed. Please try again."
+      try {
+        const errorJson = JSON.parse(errorText)
+        if (errorJson.error?.message) {
+          // Check for common error types
+          if (errorJson.error.message.includes("API key")) {
+            userMessage = "Image generation service configuration error."
+          } else if (errorJson.error.message.includes("quota")) {
+            userMessage = "Service temporarily unavailable. Please try again later."
+          } else if (errorJson.error.message.includes("safety")) {
+            userMessage = "Image could not be generated due to content restrictions."
+          }
+        }
+      } catch {
+        // Keep default message
+      }
+
       return new Response(
-        JSON.stringify({ error: "Image generation failed. Please try again." }),
+        JSON.stringify({ error: userMessage }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
@@ -262,9 +315,9 @@ serve(async (req) => {
     let generatedImageData: string | null = null
     let generatedMimeType: string | null = null
 
-    const parts = geminiResult.candidates?.[0]?.content?.parts
-    if (parts) {
-      for (const part of parts) {
+    const responseParts = geminiResult.candidates?.[0]?.content?.parts
+    if (responseParts) {
+      for (const part of responseParts) {
         if (part.inlineData) {
           generatedImageData = part.inlineData.data
           generatedMimeType = part.inlineData.mimeType
